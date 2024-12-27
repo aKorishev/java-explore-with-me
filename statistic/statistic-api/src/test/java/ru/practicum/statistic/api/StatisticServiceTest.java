@@ -18,11 +18,6 @@ import ru.practicum.statistic.dto.StatisticInfo;
 import java.text.ParseException;
 import java.util.List;
 
-import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
 @SpringBootTest
 public class StatisticServiceTest {
     @Mock
