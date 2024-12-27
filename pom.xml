@@ -13,6 +13,7 @@
 	<name>Explore With Me</name>
 	<modules>
 		<module>statistic</module>
+		<module>ewm-service</module>
 	</modules>
 
 	<groupId>ru.practicum</groupId>
