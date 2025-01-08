@@ -14,7 +14,8 @@
 	<modules>
 		<module>statistic</module>
 		<module>ewm-service</module>
-	</modules>
+        <module>stats-service</module>
+    </modules>
 
 	<groupId>ru.practicum</groupId>
 	<artifactId>explore-with-me</artifactId>
