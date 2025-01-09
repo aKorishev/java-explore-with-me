@@ -1,0 +1,10 @@
+spring:
+  main:
+    #log-startup-info: false # выводим служебную информацию
+    banner-mode: off       # не выводим баннер
+logging.level:
+  #ru: TRACE
+  #org: TRACE
+  #ru.practicum.statistic: TRACE
+  org:
+    zalando.logbook: TRACE
