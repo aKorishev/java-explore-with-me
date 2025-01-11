@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.statistic.api.exceptions.NotValidException;
 import ru.practicum.statistic.dto.StatisticInfo;
+import ru.practicum.statistic.dto.ViewStats;
 import ru.practicum.statistic.dto.vlidators.TimeFormatValidator;
 
 import java.sql.Timestamp;
@@ -23,6 +24,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class StatisticStorage {
     private final StatisticRepository statisticRepository;
+    private final EndPointhitRepository endPointhitRepository;
 
     @PersistenceContext
     EntityManager entityManager;
@@ -61,6 +63,19 @@ public class StatisticStorage {
                 .getResultList();
 
         return result;
+    }
+
+    public List<ViewStats> getCalculatedStatistics(
+            String start,
+            String end,
+            List<String> uris,
+            Integer limit,
+            Boolean unique) {
+        if (uris == null || uris.isEmpty()) {
+            throw new IllegalArgumentException("URI list cannot be empty.");
+        }
+
+        return endPointhitRepository.getIntervalStats(start, end, uris, limit, unique);
     }
 
     public <T> Optional<Predicate> getPredicate(String start,

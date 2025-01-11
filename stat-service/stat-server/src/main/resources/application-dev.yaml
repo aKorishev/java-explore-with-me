@@ -4,7 +4,8 @@ spring:
     banner-mode: off       # не выводим баннер
 logging.level:
   #ru: TRACE
-  #org: TRACE
-  #ru.practicum.statistic: TRACE
+#  org: TRACE
+  ru.practicum.statistic: TRACE
   org:
+    #apache.coyote.http11.Http11InputBuffer: TRACE
     zalando.logbook: TRACE

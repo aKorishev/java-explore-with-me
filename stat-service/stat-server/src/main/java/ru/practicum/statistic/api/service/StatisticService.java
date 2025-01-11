@@ -6,6 +6,7 @@ import ru.practicum.statistic.api.exceptions.NotValidException;
 import ru.practicum.statistic.api.storage.StatisticStorage;
 import ru.practicum.statistic.dto.StatisticRequest;
 import ru.practicum.statistic.dto.StatisticInfo;
+import ru.practicum.statistic.dto.ViewStats;
 
 import java.text.ParseException;
 import java.util.List;
@@ -34,5 +35,14 @@ public class StatisticService {
         } catch (ParseException e) {
             throw new NotValidException(e.getMessage());
         }
+    }
+
+    public List<ViewStats> getCalculatedStatistics(
+            String start,
+            String end,
+            List<String> uris,
+            Integer limit,
+            Boolean unique) {
+        return storage.getCalculatedStatistics(start, end, uris, limit, unique);
     }
 }
