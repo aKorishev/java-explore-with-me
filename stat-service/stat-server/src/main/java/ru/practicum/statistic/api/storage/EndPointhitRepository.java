@@ -1,7 +1,6 @@
 package ru.practicum.statistic.api.storage;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -12,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ru.practicum.statistic.api.exceptions.NotValidException;
+import ru.practicum.statistic.api.tool.Union;
 import ru.practicum.statistic.dto.EndpointHit;
 import ru.practicum.statistic.dto.ViewStats;
 
@@ -34,15 +35,32 @@ public class EndPointhitRepository {
 					"order by hits desc";
 
 	@Transactional
-	public void saveHit(EndpointHit hit) {
-		Optional<Integer> appIdOpt = getAppId(hit.getApp());
+	public EndpointHit saveHit(EndpointHit hit) {
+		var application = hit.getApp();
+		var appIdOpt = getAppId(application);
 
-		if (appIdOpt.isEmpty()) {
-			jdbc.update("INSERT INTO apps(name) VALUES(?)", hit.getApp());
-			appIdOpt = getAppId(hit.getApp());
+		if (appIdOpt.hasValue1() == false) {
+			jdbc.update("INSERT INTO apps(name) VALUES(?)", application);
+			appIdOpt = getAppId(application);
 		}
 
-		jdbc.update(INSERT_HIT_SQL, appIdOpt.get(), hit.getUri(), hit.getIp(), hit.getTimestamp());
+		if (appIdOpt.hasValue2()) {
+			var exception = appIdOpt.getValue2().get();
+
+			log.debug("No record found for application [" + application + "]", exception);
+
+			throw new NotValidException(exception.getMessage());
+		}
+
+		if (appIdOpt.hasValue1() == false) {
+			throw new NotValidException("Don't found application [" + application + "]");
+		}
+
+		var appId = appIdOpt.getValue1().get();
+
+		jdbc.update(INSERT_HIT_SQL, appId, hit.getUri(), hit.getIp(), hit.getTimestamp());
+
+		return hit;
 	}
 
 	public List<ViewStats> getIntervalStats(
@@ -58,13 +76,14 @@ public class EndPointhitRepository {
 				end);
 	}
 
-	private Optional<Integer> getAppId(String application) {
+	private Union<Integer, EmptyResultDataAccessException> getAppId(String application) {
 		try {
-			Integer appId = jdbc.queryForObject("SELECT id FROM apps where name like ?", Integer.class, application);
-			return Optional.ofNullable(appId);
+			var appId = jdbc.queryForObject("SELECT id FROM apps where name like ?", Integer.class, application);
+
+			return Union.ofValue1(appId);
 		} catch (EmptyResultDataAccessException e) {
-			log.debug("No record found for application [" + application + "]", e);
-			return Optional.empty();
+			//log.debug("No record found for application [" + application + "]", e);
+			return Union.ofValue2(e);
 		}
 	}
 
@@ -80,11 +99,14 @@ public class EndPointhitRepository {
 			sql = VIEWS_STATS_SQL.replace("#1#", "count(*)");
 		}
 
-		String uriString = uris
-				.stream()
-				.map(path -> "'" + path + "'")
-				.collect(Collectors.joining(","));
-		sql = sql.replace("#2#", " and h.uri in (" + uriString + ")");
+		if (!uris.isEmpty()) {
+			var uriQuery = uris.stream()
+					.map(path -> "'" + path + "'")
+					.collect(Collectors.joining(","));
+			sql = sql.replace("#2#", " and h.uri in (" + uriQuery + ")");
+		} else {
+			sql = sql.replace("#2#", "");
+		}
 
 		return (limit != null && limit != 0) ? sql + " limit " + limit : sql;
 	}

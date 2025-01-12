@@ -4,11 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.statistic.api.exceptions.NotValidException;
 import ru.practicum.statistic.api.storage.StatisticStorage;
-import ru.practicum.statistic.dto.StatisticRequest;
+import ru.practicum.statistic.dto.EndpointHit;
 import ru.practicum.statistic.dto.StatisticInfo;
 import ru.practicum.statistic.dto.ViewStats;
 
-import java.text.ParseException;
 import java.util.List;
 
 @Service
@@ -25,14 +24,16 @@ public class StatisticService {
         return storage.getStatistics(start, end, uris, unique);
     }
 
-    public StatisticRequest postRequest(StatisticRequest statisticRequest) {
+    public EndpointHit postRequest(EndpointHit statisticRequest) {
         try {
-            var entity = StatisticMapper.toNewEntity(statisticRequest);
+            //var entity = StatisticMapper.toEndPointHitEntity(statisticRequest);
 
-            entity = storage.postStaticEntity(entity);
+            var entity = storage.postStaticEntity(statisticRequest);
 
-            return StatisticMapper.toDto(entity);
-        } catch (ParseException e) {
+            //return StatisticMapper.toDto(entity);
+
+            return entity;
+        } catch (Exception e) {
             throw new NotValidException(e.getMessage());
         }
     }

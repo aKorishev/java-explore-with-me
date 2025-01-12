@@ -10,6 +10,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
+    <name>main-service</name>
     <artifactId>main-service</artifactId>
 
     <dependencies>
@@ -81,6 +82,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.zalando</groupId>
+            <artifactId>logbook-spring-boot-starter</artifactId>
+            <version>3.9.0</version>
         </dependency>
     </dependencies>
 

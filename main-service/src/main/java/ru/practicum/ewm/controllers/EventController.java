@@ -1,6 +1,7 @@
 package ru.practicum.ewm.controllers;
 
 import lombok.AllArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -31,8 +32,8 @@ public class EventController {
 											   @RequestParam(defaultValue = "0") long lat,
 											   @RequestParam(defaultValue = "0") long lon,
 											   @RequestParam(defaultValue = "0") @PositiveOrZero short radius,
-											   @RequestParam(required = false) String rangeStart,
-											   @RequestParam(required = false) String rangeEnd,
+											   @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") String rangeStart,
+											   @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") String rangeEnd,
 											   @RequestParam(defaultValue = "false") boolean onlyAvailable,
 											   @RequestParam(defaultValue = "EVENT_DATE") String sort,
 											   @RequestParam(defaultValue = "0") @PositiveOrZero int from,

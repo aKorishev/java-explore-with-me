@@ -1,6 +1,7 @@
 package ru.practicum.ewm.serices;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +24,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static org.springframework.data.domain.Sort.Order.desc;
 
@@ -95,11 +97,10 @@ public class EventService {
 				.map(ViewStats::getHits)
 				.orElse(0L);
 
-		throw new Error();
-		/*QParticipationRequest req = QParticipationRequest.participationRequest;
+		QParticipationRequest req = QParticipationRequest.participationRequest;
 		long reqCount = requestRepository.count(req.event.eq(event).and(req.status.eq(RequestStatus.CONFIRMED)));
 
-		return Mapper.toEventFullDto(event, views, reqCount);*/
+		return Mapper.toEventFullDto(event, views, reqCount);
 	}
 
 	@Transactional
@@ -368,8 +369,7 @@ public class EventService {
 	}
 
 	private static BooleanExpression makeEventsQueryConditions(GetEventsRequest request) {
-		throw new Error();
-		/*QEvent event = QEvent.event;
+		QEvent event = QEvent.event;
 
 		List<BooleanExpression> conditions = new ArrayList<>();
 
@@ -440,12 +440,11 @@ public class EventService {
 		return conditions
 				.stream()
 				.reduce(BooleanExpression::and)
-				.get();*/
+				.get();
 	}
 
 	private Map<Long, Long> getEventRequests(Collection<Event> events) {
-		throw new Error();
-		/*QParticipationRequest req = QParticipationRequest.participationRequest;
+		QParticipationRequest req = QParticipationRequest.participationRequest;
 
 		BooleanExpression condition = req.status.eq(RequestStatus.CONFIRMED)
 				.and(req.event.in(events));
@@ -453,7 +452,7 @@ public class EventService {
 		Iterable<ParticipationRequest> reqs = requestRepository.findAll(condition);
 		return StreamSupport
 				.stream(reqs.spliterator(), false)
-				.collect(Collectors.groupingBy(r -> r.getEvent().getId(), Collectors.counting()));*/
+				.collect(Collectors.groupingBy(r -> r.getEvent().getId(), Collectors.counting()));
 	}
 
 	private Map<Long, Long> getEventViews(Collection<Event> events) {

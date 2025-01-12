@@ -1,6 +1,7 @@
 package ru.practicum.ewm.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -27,8 +28,8 @@ public class AdminEventController {
 	public List<? extends EventBase> getEvents(@RequestParam(required = false) List<Long> users,
 											   @RequestParam(required = false) List<String> states,
 											   @RequestParam(required = false) List<Long> categories,
-											   @RequestParam(required = false) String rangeStart,
-											   @RequestParam(required = false) String rangeEnd,
+											   @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") String rangeStart,
+											   @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") String rangeEnd,
 											   @RequestParam(defaultValue = "0") @PositiveOrZero int from,
 											   @RequestParam(defaultValue = "10") @Positive int size) {
 		return eventService.find(

@@ -9,6 +9,7 @@ import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.statistic.api.exceptions.NotValidException;
+import ru.practicum.statistic.dto.EndpointHit;
 import ru.practicum.statistic.dto.StatisticInfo;
 import ru.practicum.statistic.dto.ViewStats;
 import ru.practicum.statistic.dto.vlidators.TimeFormatValidator;
@@ -23,14 +24,15 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class StatisticStorage {
-    private final StatisticRepository statisticRepository;
     private final EndPointhitRepository endPointhitRepository;
 
     @PersistenceContext
     EntityManager entityManager;
 
-    public StatisticEntity postStaticEntity(StatisticEntity statisticEntity) {
-        return statisticRepository.saveAndFlush(statisticEntity);
+    public EndpointHit postStaticEntity(EndpointHit endPointHit) {
+        var hit = endPointhitRepository.saveHit(endPointHit);
+
+        return hit;
     }
 
     public List<StatisticInfo> getStatistics(
@@ -71,11 +73,10 @@ public class StatisticStorage {
             List<String> uris,
             Integer limit,
             Boolean unique) {
-        if (uris == null || uris.isEmpty()) {
-            throw new IllegalArgumentException("URI list cannot be empty.");
-        }
 
-        return endPointhitRepository.getIntervalStats(start, end, uris, limit, unique);
+        var result = endPointhitRepository.getIntervalStats(start, end, uris, limit, unique);
+
+        return result;
     }
 
     public <T> Optional<Predicate> getPredicate(String start,

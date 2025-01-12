@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import ru.practicum.ewm.dto.*;
 import ru.practicum.ewm.entities.*;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.stream.Collectors;
@@ -76,12 +77,21 @@ public final class Mapper {
 	}
 
 	public static ParticipationRequestDto toParticipationRequestDto(ParticipationRequest request) {
+		var localDateTime = request.getCreated().toLocalDateTime();
+		localDateTime = LocalDateTime.of(
+				localDateTime.getYear(),
+				localDateTime.getMonth(),
+				localDateTime.getDayOfMonth(),
+				localDateTime.getHour(),
+				localDateTime.getMinute(),
+				localDateTime.getSecond());
+
 		return ParticipationRequestDto.of(
 				request.getId(),
 				request.getRequester().getId(),
 				request.getEvent().getId(),
 				request.getStatus().name(),
-				request.getCreated()
+				localDateTime
 		);
 	}
 
@@ -117,7 +127,11 @@ public final class Mapper {
 	}
 
 	public static User toNewUser(NewUserRequest dto) {
-		return User.of(null, dto.getName(), dto.getEmail());
+		var entity = new User();
+		entity.setEmail(dto.getEmail());
+		entity.setName(dto.getName());
+
+		return entity;
 	}
 
 	public static Compilation toNewCompilation(NewCompilationDto dto, Collection<Event> events) {

@@ -1,6 +1,7 @@
 package ru.practicum.ewm.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -20,12 +21,14 @@ public class CategoryController {
 	private final CategoryService categoryService;
 
 	@GetMapping
+	@ResponseStatus(HttpStatus.OK)
 	public List<CategoryDto> getCategories(@RequestParam(defaultValue = "0") @PositiveOrZero int from,
 										   @RequestParam(defaultValue = "10") @Positive int size) {
 		return categoryService.getAll(from, size);
 	}
 
 	@GetMapping("/{catId}")
+	@ResponseStatus(HttpStatus.OK)
 	public CategoryDto getCategory(@PathVariable long catId) {
 		return categoryService.getCategory(catId);
 	}

@@ -36,7 +36,7 @@ public class StatisticClient {
     private final HttpClient httpClient;
 
     public StatisticClient(@Value("${spring.application.name}") String application,
-                           @Value("${services.stats-service.uri:http://localhost:9090}") String statsServiceUri,
+                           @Value("${services.stats-service.uri}") String statsServiceUri,
                            ObjectMapper json) {
         this.application = application;
         this.statsServiceUri = statsServiceUri;

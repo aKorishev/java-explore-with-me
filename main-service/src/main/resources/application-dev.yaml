@@ -4,15 +4,16 @@ spring:
     banner-mode: off       # не выводим баннер
   datasource:
     driverClassName: org.h2.Driver
-    url: jdbc:h2:mem:shareit
+    url: jdbc:h2:mem:main-db
   jpa:
     #show-sql: true
     show-sql: false
+    properties.hibernate.dialect=:
 logging.level:
   ru.practicum: TRACE
   #org: TRACE
-#org:
-  zalando.logbook: TRACE
+  org:
+    zalando.logbook: TRACE
 #    hibernate:
 #      type.descriptor.sql.BasicBinder: TRACE
 #      orm.jdbc.bind: TRACE

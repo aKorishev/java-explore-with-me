@@ -1,6 +1,7 @@
 package ru.practicum.ewm.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +31,7 @@ public class CompilationController {
 	}
 
 	@GetMapping("/{compId}")
+	@ResponseStatus(HttpStatus.OK)
 	public CompilationDto getCompilation(@PathVariable long compId) {
 		return compService.getById(compId);
 	}

@@ -35,8 +35,12 @@ public class UserService {
 
 	@Transactional
 	public UserDto addUser(NewUserRequest newUserRequest) {
-		User user = userRepository.save(Mapper.toNewUser(newUserRequest));
-		return Mapper.toUserDto(user);
+		var entity = new User();
+		entity.setName(newUserRequest.getName());
+		entity.setEmail(newUserRequest.getEmail());
+
+		userRepository.saveAndFlush(entity);
+		return Mapper.toUserDto(entity);
 	}
 
 	@Transactional

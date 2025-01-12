@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.statistic.dto.StatisticRequest;
+import ru.practicum.statistic.dto.EndpointHit;
 import ru.practicum.statistic.dto.ViewStats;
 
 import java.util.List;
@@ -27,8 +27,8 @@ public class StatisticController {
 
     @PostMapping("/hit")
     @ResponseStatus(HttpStatus.CREATED)
-    public StatisticRequest postRequest(
-            @Valid @RequestBody StatisticRequest statisticRequest) {
+    public EndpointHit postRequest(
+            @Valid @RequestBody EndpointHit statisticRequest) {
         return statisticService.postRequest(statisticRequest);
     }
 }

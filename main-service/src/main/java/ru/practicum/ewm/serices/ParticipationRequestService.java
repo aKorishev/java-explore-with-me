@@ -73,7 +73,7 @@ public class ParticipationRequestService {
 		if (event.getParticipantLimit() == 0) {
 			request.setStatus(RequestStatus.CONFIRMED);
 		}
-		requestRepository.save(request);
+		requestRepository.saveAndFlush(request);
 
 		return Mapper.toParticipationRequestDto(request);
 	}

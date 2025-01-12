@@ -4,7 +4,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Objects;
 
 @Entity
@@ -29,7 +31,7 @@ public class ParticipationRequest {
 	@Column(name = "status", nullable = false)
 	private RequestStatus status = RequestStatus.PENDING;
 
-	private LocalDateTime created = LocalDateTime.now();
+	private Timestamp created = Timestamp.from(Instant.now());
 
 	@Transient
 	public boolean isDataMatchRequest(long eventId, long initiatorId) {
