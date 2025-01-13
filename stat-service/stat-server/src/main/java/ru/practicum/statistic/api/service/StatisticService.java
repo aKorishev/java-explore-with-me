@@ -51,7 +51,7 @@ public class StatisticService {
             List<String> uris,
             Integer limit,
             Boolean unique) {
-        
+
         if (start ==  null || start.isBlank())
             throw new NotValidException("Start is empty");
 
