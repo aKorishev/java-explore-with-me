@@ -80,7 +80,7 @@ public class EndPointhitRepository {
 				end);
 
 		log.trace("Selected " + result.size() + " items of ViewStats");
-		log.trace(result);
+		log.trace(result.toString());
 
 		return result;
 	}
