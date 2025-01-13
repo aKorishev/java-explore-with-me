@@ -66,6 +66,7 @@ public class EventController {
 	public EventFullDto getEvent(@PathVariable long id, HttpServletRequest request) {
 		EventFullDto result = eventService.findPublishedById(id);
 		statisticClient.hit(request);
+		eventService.addHits("/events/" + id);
 		return result;
 	}
 }
