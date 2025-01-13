@@ -1,4 +1,7 @@
 spring:
   sql.init:
     schema-locations: classpath:schema.sql
-logging.level.ru.practicum: TRACE
+logging.level:
+  ru.practicum: TRACE
+  org:
+    zalando.logbook: TRACE

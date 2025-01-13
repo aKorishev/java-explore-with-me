@@ -1,6 +1,7 @@
 package ru.practicum.statistic.api.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.statistic.api.exceptions.NotValidException;
 import ru.practicum.statistic.api.storage.StatisticStorage;
@@ -14,6 +15,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class StatisticService {
@@ -49,6 +51,13 @@ public class StatisticService {
             List<String> uris,
             Integer limit,
             Boolean unique) {
+        
+        if (start ==  null || start.isBlank())
+            throw new NotValidException("Start is empty");
+
+        if (end ==  null || end.isBlank())
+            throw new NotValidException("End is empty");
+
         try {
             var startTimeStamp = Timestamp.from(simpleDateFormat.parse(start).toInstant());
             var endTimeStamp = Timestamp.from(simpleDateFormat.parse(end).toInstant());
