@@ -1,5 +1,6 @@
 package ru.practicum.statistic.api.storage;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -66,8 +67,8 @@ public class EndPointhitRepository {
 	}
 
 	public List<ViewStats> getIntervalStats(
-			String start,
-			String end,
+			Timestamp start,
+			Timestamp end,
 			List<String> uris,
 			Integer limit,
 			Boolean unique) {

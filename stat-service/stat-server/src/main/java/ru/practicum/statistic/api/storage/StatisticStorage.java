@@ -68,8 +68,8 @@ public class StatisticStorage {
     }
 
     public List<ViewStats> getCalculatedStatistics(
-            String start,
-            String end,
+            Timestamp start,
+            Timestamp end,
             List<String> uris,
             Integer limit,
             Boolean unique) {
