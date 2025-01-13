@@ -60,6 +60,8 @@ public class EndPointhitRepository {
 
 		jdbc.update(INSERT_HIT_SQL, appId, hit.getUri(), hit.getIp(), hit.getTimestamp());
 
+		log.trace("Save hit " + hit);
+
 		return hit;
 	}
 
