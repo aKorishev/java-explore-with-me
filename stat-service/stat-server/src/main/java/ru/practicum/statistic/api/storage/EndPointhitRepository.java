@@ -96,8 +96,8 @@ public class EndPointhitRepository {
 
 		String sql;
 		if (isUnique) {
-			//sql = VIEWS_STATS_SQL.replace("#1#", "count(distinct h.ip)");
-			sql = VIEWS_STATS_SQL.replace("#1#", "1");
+			sql = VIEWS_STATS_SQL.replace("#1#", "count(distinct h.ip)");
+			//sql = VIEWS_STATS_SQL.replace("#1#", "1");
 		} else {
 			sql = VIEWS_STATS_SQL.replace("#1#", "count(*)");
 		}
