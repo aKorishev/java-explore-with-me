@@ -72,11 +72,17 @@ public class EndPointhitRepository {
 			List<String> uris,
 			Integer limit,
 			Boolean unique) {
-		return jdbc.query(
+
+		var result = jdbc.query(
 				getViewsStatsSql(uris, limit, unique),
 				BeanPropertyRowMapper.newInstance(ViewStats.class),
 				start,
 				end);
+
+		log.trace("Selected " + result.size() + " items of ViewStats");
+		log.trace(result);
+
+		return result;
 	}
 
 	private Union<Integer, EmptyResultDataAccessException> getAppId(String application) {
