@@ -1,4 +1,5 @@
 spring:
+  application.name: ewm-main-service
   jpa:
     hibernate.ddl-auto: none
     properties:
@@ -9,3 +10,5 @@ spring:
     mode: always
     schema-locations: classpath:schema.sql
 logging.level.ru.practicum: TRACE
+
+

@@ -34,6 +34,6 @@ public class EndpointHit {
 
     @Override
     public String toString() {
-        return String.format("{id: %d; app: %s; uri %s; ip: %s; timestamp: %s", id, app, uri, ip, timestamp.format(DateTimeFormatter.ofPattern(TimeFormatValidator.PATTERN)));
+        return String.format("{id: %d; app: %s; uri; %s; ip: %s; timestamp: %s}", id, app, uri, ip, timestamp.format(DateTimeFormatter.ofPattern(TimeFormatValidator.PATTERN)));
     }
 }

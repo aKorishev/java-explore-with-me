@@ -14,6 +14,6 @@ public class ViewStats {
 
     @Override
     public String toString() {
-        return String.format("{app %s; uri %s; hits: %d", app, uri, hits);
+        return String.format("{app: %s; uri: %s; hits: %d}", app, uri, hits);
     }
 }

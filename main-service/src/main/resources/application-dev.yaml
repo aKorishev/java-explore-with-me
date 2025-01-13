@@ -17,3 +17,7 @@ logging.level:
 #    hibernate:
 #      type.descriptor.sql.BasicBinder: TRACE
 #      orm.jdbc.bind: TRACE
+
+
+
+services.stats-service.uri: http://localhost:9090
