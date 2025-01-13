@@ -62,7 +62,7 @@ public class StatisticService {
             var startTimeStamp = Timestamp.from(simpleDateFormat.parse(start).toInstant());
             var endTimeStamp = Timestamp.from(simpleDateFormat.parse(end).toInstant());
 
-            if (startTimeStamp.before(endTimeStamp))
+            if (startTimeStamp.after(endTimeStamp))
                 throw new NotValidException("Start need be before end");
 
             return storage.getCalculatedStatistics(startTimeStamp, endTimeStamp, uris, limit, unique);
