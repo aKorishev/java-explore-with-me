@@ -22,7 +22,7 @@ services:
     image: postgres:14-alpine
     container_name: "stats-db"
     ports:
-      - "6541:5432"
+      - "6543:5432"
     volumes:
       - /var/lib/postgresql/stats-service
     environment:
