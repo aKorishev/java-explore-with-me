@@ -59,9 +59,9 @@ public class EndPointhitRepository {
 
 		var appId = appIdOpt.getValue1().get();
 
-		jdbc.update(INSERT_HIT_SQL, appId, hit.getUri(), hit.getIp(), hit.getTimestamp());
+		var id = jdbc.update(INSERT_HIT_SQL, appId, hit.getUri(), hit.getIp(), hit.getTimestamp());
 
-		log.trace("Save hit " + hit);
+		log.trace("Save hit " + hit + ", id = " + id);
 
 		return hit;
 	}
