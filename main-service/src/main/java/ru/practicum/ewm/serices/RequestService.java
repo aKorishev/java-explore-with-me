@@ -7,7 +7,6 @@ import ru.practicum.ewm.dto.RequestDto;
 import ru.practicum.ewm.entities.*;
 import ru.practicum.ewm.exceptions.IdIsAlreadyInUseException;
 import ru.practicum.ewm.exceptions.NotFoundException;
-import ru.practicum.ewm.exceptions.NotValidException;
 import ru.practicum.ewm.repository.EventRepository;
 import ru.practicum.ewm.repository.RequestRepository;
 import ru.practicum.ewm.repository.UserRepository;

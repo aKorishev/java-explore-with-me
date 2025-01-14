@@ -1,7 +1,6 @@
 package ru.practicum.ewm.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.dto.EventShortDto;
