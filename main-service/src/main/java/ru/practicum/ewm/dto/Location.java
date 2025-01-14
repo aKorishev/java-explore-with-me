@@ -1,5 +1,13 @@
 package ru.practicum.ewm.dto;
 
-public record Location(
-    float lat,
-    float lon) { }
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+import java.io.Serializable;
+
+@Data
+@AllArgsConstructor
+public class Location implements Serializable {
+    float lat;
+    float lon;
+}

@@ -60,7 +60,7 @@ public class CategoryService {
         CategoryEntity entity = categoryRepository.findById(catId)
                 .orElseThrow(() -> new NotFoundException("Category", catId));
 
-        entity.setName(categoryDto.name());
+        entity.setName(categoryDto.getName());
 
         categoryRepository.saveAndFlush(entity);
 

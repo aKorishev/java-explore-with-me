@@ -222,8 +222,8 @@ public class EventService {
 		if (eventToUpdateDto.location() != null) {
 			var location = eventToUpdateDto.location();
 
-			entity.setLatitude(location.lat());
-			entity.setLongitude(location.lon());
+			entity.setLatitude(location.getLat());
+			entity.setLongitude(location.getLon());
 
 			wasUpdated = true;
 		}

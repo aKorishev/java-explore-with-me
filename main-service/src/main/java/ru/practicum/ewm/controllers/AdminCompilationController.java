@@ -2,7 +2,6 @@ package ru.practicum.ewm.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.dto.CompilationDto;
 import ru.practicum.ewm.dto.CompilationToAddDto;
@@ -13,7 +12,7 @@ import ru.practicum.ewm.serices.CompilationService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = "/admin/compilations", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "/admin/compilations")
 public class AdminCompilationController {
 	private final CompilationService compService;
 

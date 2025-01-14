@@ -2,7 +2,6 @@ package ru.practicum.ewm.controllers;
 
 import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.dto.*;
@@ -20,7 +19,7 @@ import java.util.List;
 @Validated
 @RestController
 @AllArgsConstructor
-@RequestMapping(path = "/events", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "/events")
 public class EventController {
 	private final EventService eventService;
 	private final StatisticClient statisticClient;

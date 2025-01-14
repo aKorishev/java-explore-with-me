@@ -2,7 +2,6 @@ package ru.practicum.ewm.controllers;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.dto.*;
@@ -17,7 +16,7 @@ import java.util.List;
 @Validated
 @RestController
 @AllArgsConstructor
-@RequestMapping(path = "/users/{userId}/events", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "/users/{userId}/events")
 public class UserEventController {
 	private final EventService eventService;
 

@@ -23,8 +23,8 @@ public final class Mapper {
 				.paid(dto.isPaid())
 				.eventDate(dto.getEventDate())
 				.initiator(initiator)
-				.latitude(dto.getLocation().lat())
-				.longitude(dto.getLocation().lon())
+				.latitude(dto.getLocation().getLat())
+				.longitude(dto.getLocation().getLon())
 				.requestModeration(dto.isRequestModeration())
 				.build();
 	}

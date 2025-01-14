@@ -2,7 +2,6 @@ package ru.practicum.ewm.controllers;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.dto.ParticipationRequestDto;
 import ru.practicum.ewm.serices.ParticipationRequestService;
@@ -11,7 +10,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping(path = "/users/{userId}/requests", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "/users/{userId}/requests")
 public class UserRequestController {
 	private final ParticipationRequestService requestService;
 

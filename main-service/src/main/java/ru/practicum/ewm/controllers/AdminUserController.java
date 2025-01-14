@@ -2,7 +2,6 @@ package ru.practicum.ewm.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.dto.UserToAddDto;
@@ -17,7 +16,7 @@ import java.util.List;
 
 @Validated
 @RestController
-@RequestMapping(path = "/admin/users", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "/admin/users")
 @RequiredArgsConstructor
 public class AdminUserController {
 	private final UserService userService;
