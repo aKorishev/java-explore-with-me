@@ -12,10 +12,10 @@ import java.time.LocalDateTime;
 @Builder(toBuilder = true)
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
-public class Event {
+public class EventEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id", nullable = false)
+	@Column(name = "event_id", nullable = false)
 	private Long id;
 
 	@Column(nullable = false)
@@ -28,7 +28,7 @@ public class Event {
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "cat_id", nullable = false)
-	private Category category;
+	private CategoryEntity categoryEntity;
 
 	private int participantLimit;
 
@@ -54,7 +54,7 @@ public class Event {
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "initiator_id", nullable = false)
-	private User initiator;
+	private UserEntity initiator;
 
 	@Builder.Default
 	@Column(name = "req_moderation")

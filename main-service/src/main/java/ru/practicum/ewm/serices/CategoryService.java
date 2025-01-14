@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.dto.CategoryDto;
 import ru.practicum.ewm.dto.CategoryToAddDto;
-import ru.practicum.ewm.entities.Category;
+import ru.practicum.ewm.entities.CategoryEntity;
 import ru.practicum.ewm.exceptions.NotFoundException;
 import ru.practicum.ewm.repository.CategoryRepository;
 import ru.practicum.ewm.repository.EventRepository;
@@ -31,8 +31,8 @@ public class CategoryService {
 
     @Transactional
     public CategoryDto save(CategoryToAddDto categoryDto) {
-        Category category = categoryRepository.save(Mapper.toNewCategory(categoryDto));
-        return Mapper.toCategoryDto(category);
+        CategoryEntity categoryEntity = categoryRepository.save(Mapper.toNewCategory(categoryDto));
+        return Mapper.toCategoryDto(categoryEntity);
     }
 
     public CategoryDto getCategory(long catId) {
@@ -44,7 +44,7 @@ public class CategoryService {
 
     @Transactional
     public void delete(long catId) {
-        long categoryEvents = eventRepository.countByCategoryId(catId);
+        long categoryEvents = eventRepository.countByCategoryEntityId(catId);
         if (categoryEvents > 0) {
             throw new IllegalStateException("The category is not empty");
         }
@@ -57,7 +57,7 @@ public class CategoryService {
 
     @Transactional
     public CategoryDto update(long catId, CategoryDto categoryDto) {
-        Category entity = categoryRepository.findById(catId)
+        CategoryEntity entity = categoryRepository.findById(catId)
                 .orElseThrow(() -> new NotFoundException("Category", catId));
 
         entity.setName(categoryDto.name());

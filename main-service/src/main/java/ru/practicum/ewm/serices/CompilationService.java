@@ -7,8 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.dto.CompilationDto;
 import ru.practicum.ewm.dto.CompilationToAddDto;
 import ru.practicum.ewm.dto.CompilationToUpdateDto;
-import ru.practicum.ewm.entities.Compilation;
-import ru.practicum.ewm.entities.Event;
+import ru.practicum.ewm.entities.CompilationEntity;
+import ru.practicum.ewm.entities.EventEntity;
 import ru.practicum.ewm.exceptions.NotFoundException;
 import ru.practicum.ewm.repository.CompilationRepository;
 import ru.practicum.ewm.repository.EventRepository;
@@ -46,35 +46,35 @@ public class CompilationService {
 
 	@Transactional
 	public CompilationDto save(CompilationToAddDto compilationDto) {
-		List<Event> events;
+		List<EventEntity> eventEntities;
 		if (compilationDto.getEvents() == null || compilationDto.getEvents().isEmpty()) {
-			events = new ArrayList<>();
+			eventEntities = new ArrayList<>();
 		} else {
-			events = eventRepository.findAllById(compilationDto.getEvents());
+			eventEntities = eventRepository.findAllById(compilationDto.getEvents());
 		}
-		Compilation comp = repository.save(Mapper.toNewCompilation(compilationDto, events));
+		CompilationEntity comp = repository.save(Mapper.toNewCompilation(compilationDto, eventEntities));
 		return Mapper.toCompilationDto(comp);
 	}
 
 	@Transactional
 	public void addEvents(long compId, Collection<Long> eventIds) {
-		Compilation compilation = repository.findById(compId)
+		CompilationEntity compilationEntity = repository.findById(compId)
 				.orElseThrow(() -> new NotFoundException("Подборка", compId));
 
-		List<Event> events = eventRepository.findAllById(eventIds);
+		List<EventEntity> eventEntities = eventRepository.findAllById(eventIds);
 
-		compilation.getEvents().addAll(events);
+		compilationEntity.getEventEntities().addAll(eventEntities);
 
-		repository.save(compilation);
+		repository.save(compilationEntity);
 	}
 
 	@Transactional
 	public void removeEvents(long compId, Set<Long> eventIds) {
-		Compilation compilation = repository.findById(compId)
+		CompilationEntity compilationEntity = repository.findById(compId)
 				.orElseThrow(() -> new NotFoundException("Подборка", compId));
 
-		compilation.getEvents().removeIf(event -> eventIds.contains(event.getId()));
-		repository.save(compilation);
+		compilationEntity.getEventEntities().removeIf(event -> eventIds.contains(event.getId()));
+		repository.save(compilationEntity);
 	}
 
 	@Transactional
@@ -93,23 +93,23 @@ public class CompilationService {
 			throw new IllegalArgumentException("The compilation update request contains no updates.");
 		}
 
-		Compilation compilation = repository.findById(compId)
+		CompilationEntity compilationEntity = repository.findById(compId)
 				.orElseThrow(() -> new NotFoundException("Подборка", compId));
 		if (updateRequest.isTitleNeedUpdate()) {
-			compilation.setTitle(updateRequest.getTitle());
+			compilationEntity.setTitle(updateRequest.getTitle());
 		}
 		if (updateRequest.isPinnedFlagNeedUpdate()) {
-			compilation.setPinned(updateRequest.getPinned());
+			compilationEntity.setPinned(updateRequest.getPinned());
 		}
 
 		if (updateRequest.isEventListNeedUpdate()) {
-			List<Event> events = eventRepository.findAllById(updateRequest.getEvents());
-			compilation.setEvents(new HashSet<>(events));
+			List<EventEntity> eventEntities = eventRepository.findAllById(updateRequest.getEvents());
+			compilationEntity.setEventEntities(new HashSet<>(eventEntities));
 		}
 
-		repository.save(compilation);
+		repository.save(compilationEntity);
 
-		return Mapper.toCompilationDto(compilation);
+		return Mapper.toCompilationDto(compilationEntity);
 	}
 
 	private static PageRequest page(int from, int size) {

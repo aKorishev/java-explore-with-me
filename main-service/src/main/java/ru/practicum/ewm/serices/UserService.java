@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.dto.UserToAddDto;
 import ru.practicum.ewm.dto.UserDto;
-import ru.practicum.ewm.entities.User;
+import ru.practicum.ewm.entities.UserEntity;
 import ru.practicum.ewm.exceptions.NotFoundException;
 import ru.practicum.ewm.repository.UserRepository;
 
@@ -35,7 +35,7 @@ public class UserService {
 
 	@Transactional
 	public UserDto addUser(UserToAddDto userToAddDto) {
-		var entity = new User();
+		var entity = new UserEntity();
 		entity.setName(userToAddDto.getName());
 		entity.setEmail(userToAddDto.getEmail());
 

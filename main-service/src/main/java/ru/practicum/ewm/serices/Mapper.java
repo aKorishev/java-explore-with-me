@@ -13,12 +13,12 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Mapper {
 
-	public static Event toEvent(EventToAddDto dto, User initiator, Category category) {
-		return Event.builder()
+	public static EventEntity toEvent(EventToAddDto dto, UserEntity initiator, CategoryEntity categoryEntity) {
+		return EventEntity.builder()
 				.title(dto.getTitle())
 				.annotation(dto.getAnnotation())
 				.description(dto.getDescription())
-				.category(category)
+				.categoryEntity(categoryEntity)
 				.participantLimit(dto.getParticipantLimit())
 				.paid(dto.isPaid())
 				.eventDate(dto.getEventDate())
@@ -29,54 +29,54 @@ public final class Mapper {
 				.build();
 	}
 
-	public static EventFullDto toEventFullDto(Event event) {
-		return toEventFullDto(event, null, null);
+	public static EventFullDto toEventFullDto(EventEntity eventEntity) {
+		return toEventFullDto(eventEntity, null, null);
 	}
 
-	public static EventFullDto toEventFullDto(Event event, Long views, Long confirmedRequests) {
+	public static EventFullDto toEventFullDto(EventEntity eventEntity, Long views, Long confirmedRequests) {
 		return EventFullDto.builder()
-				.id(event.getId())
-				.title(event.getTitle())
-				.annotation(event.getAnnotation())
-				.description(event.getDescription())
-				.category(toCategoryDto(event.getCategory()))
-				.participantLimit(event.getParticipantLimit())
-				.state(event.getState().name())
-				.paid(event.isPaid())
-				.eventDate(event.getEventDate())
-				.createdOn(event.getCreatedOn())
-				.publishedOn(event.getPublishedOn())
-				.initiator(Mapper.toUserShortDto(event.getInitiator()))
-				.location(new Location(event.getLatitude(), event.getLongitude()))
-				.requestModeration(event.isRequestModeration())
+				.id(eventEntity.getId())
+				.title(eventEntity.getTitle())
+				.annotation(eventEntity.getAnnotation())
+				.description(eventEntity.getDescription())
+				.category(toCategoryDto(eventEntity.getCategoryEntity()))
+				.participantLimit(eventEntity.getParticipantLimit())
+				.state(eventEntity.getState().name())
+				.paid(eventEntity.isPaid())
+				.eventDate(eventEntity.getEventDate())
+				.createdOn(eventEntity.getCreatedOn())
+				.publishedOn(eventEntity.getPublishedOn())
+				.initiator(Mapper.toUserShortDto(eventEntity.getInitiator()))
+				.location(new Location(eventEntity.getLatitude(), eventEntity.getLongitude()))
+				.requestModeration(eventEntity.isRequestModeration())
 				.views(views)
 				.confirmedRequests(confirmedRequests)
 				.build();
 	}
 
-	public static EventShortDto toEventShortDto(Event event) {
-		return toEventShortDto(event, null, null);
+	public static EventShortDto toEventShortDto(EventEntity eventEntity) {
+		return toEventShortDto(eventEntity, null, null);
 	}
 
-	public static EventShortDto toEventShortDto(Event event, Long viewsCount, Long confirmedReqsCount) {
+	public static EventShortDto toEventShortDto(EventEntity eventEntity, Long viewsCount, Long confirmedReqsCount) {
 		return EventShortDto.builder()
-				.id(event.getId())
-				.title(event.getTitle())
-				.annotation(event.getAnnotation())
-				.category(toCategoryDto(event.getCategory()))
-				.paid(event.isPaid())
-				.eventDate(event.getEventDate())
-				.initiator(Mapper.toUserShortDto(event.getInitiator()))
+				.id(eventEntity.getId())
+				.title(eventEntity.getTitle())
+				.annotation(eventEntity.getAnnotation())
+				.category(toCategoryDto(eventEntity.getCategoryEntity()))
+				.paid(eventEntity.isPaid())
+				.eventDate(eventEntity.getEventDate())
+				.initiator(Mapper.toUserShortDto(eventEntity.getInitiator()))
 				.views(viewsCount)
 				.confirmedRequests(confirmedReqsCount)
 				.build();
 	}
 
-	public static UserShortDto toUserShortDto(User user) {
-		return UserShortDto.of(user.getId(), user.getName());
+	public static UserShortDto toUserShortDto(UserEntity userEntity) {
+		return UserShortDto.of(userEntity.getId(), userEntity.getName());
 	}
 
-	public static ParticipationRequestDto toParticipationRequestDto(ParticipationRequest request) {
+	public static ParticipationRequestDto toParticipationRequestDto(ParticipationRequestEntity request) {
 		var localDateTime = request.getCreated().toLocalDateTime();
 		localDateTime = LocalDateTime.of(
 				localDateTime.getYear(),
@@ -89,62 +89,62 @@ public final class Mapper {
 		return new ParticipationRequestDto(
 				request.getId(),
 				request.getRequester().getId(),
-				request.getEvent().getId(),
+				request.getEventEntity().getId(),
 				request.getStatus().name(),
 				localDateTime
 		);
 	}
 
-	public static ParticipationRequest toNewParticipationRequest(User participant, Event event) {
-		ParticipationRequest request = new ParticipationRequest();
+	public static ParticipationRequestEntity toNewParticipationRequest(UserEntity participant, EventEntity eventEntity) {
+		ParticipationRequestEntity request = new ParticipationRequestEntity();
 		request.setRequester(participant);
-		request.setEvent(event);
+		request.setEventEntity(eventEntity);
 		// если для события отключена пре-модерация заявок на участие,
 		// то запрос на участие считается подтвержденным автоматически
-		if (!event.isRequestModeration()) {
+		if (!eventEntity.isRequestModeration()) {
 			request.setStatus(RequestStatus.CONFIRMED);
 		}
 		return request;
 	}
 
-	public static CompilationDto toCompilationDto(Compilation compilation) {
-		return new CompilationDto(compilation.getId(),
-				compilation.getTitle(),
-				compilation.isPinned(),
-				compilation
-						.getEvents()
+	public static CompilationDto toCompilationDto(CompilationEntity compilationEntity) {
+		return new CompilationDto(compilationEntity.getId(),
+				compilationEntity.getTitle(),
+				compilationEntity.isPinned(),
+				compilationEntity
+						.getEventEntities()
 						.stream()
 						.map(Mapper::toEventShortDto)
 						.collect(Collectors.toSet()));
 	}
 
-	public static UserDto toUserDto(User user) {
-		return UserDto.of(user.getId(), user.getName(), user.getEmail());
+	public static UserDto toUserDto(UserEntity userEntity) {
+		return UserDto.of(userEntity.getId(), userEntity.getName(), userEntity.getEmail());
 	}
 
-	public static User toNewUser(UserToAddDto dto) {
-		var entity = new User();
+	public static UserEntity toNewUser(UserToAddDto dto) {
+		var entity = new UserEntity();
 		entity.setEmail(dto.getEmail());
 		entity.setName(dto.getName());
 
 		return entity;
 	}
 
-	public static Compilation toNewCompilation(CompilationToAddDto dto, Collection<Event> events) {
-		Compilation compilation = new Compilation();
-		compilation.setTitle(dto.getTitle());
-		compilation.setPinned(dto.isPinned());
-		compilation.setEvents(new HashSet<>(events));
-		return compilation;
+	public static CompilationEntity toNewCompilation(CompilationToAddDto dto, Collection<EventEntity> eventEntities) {
+		CompilationEntity compilationEntity = new CompilationEntity();
+		compilationEntity.setTitle(dto.getTitle());
+		compilationEntity.setPinned(dto.isPinned());
+		compilationEntity.setEventEntities(new HashSet<>(eventEntities));
+		return compilationEntity;
 	}
 
-	public static CategoryDto toCategoryDto(Category category) {
-		return new CategoryDto(category.getId(), category.getName());
+	public static CategoryDto toCategoryDto(CategoryEntity categoryEntity) {
+		return new CategoryDto(categoryEntity.getId(), categoryEntity.getName());
 	}
 
-    public static Category toNewCategory(CategoryToAddDto categoryDto) {
-		Category category = new Category();
-		category.setName(categoryDto.getName());
-		return category;
+    public static CategoryEntity toNewCategory(CategoryToAddDto categoryDto) {
+		CategoryEntity categoryEntity = new CategoryEntity();
+		categoryEntity.setName(categoryDto.getName());
+		return categoryEntity;
     }
 }

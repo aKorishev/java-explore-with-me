@@ -8,13 +8,16 @@ import jakarta.persistence.*;
 @Getter
 @Setter
 @Entity
-@Table(name = "categories")
-public class Category {
+@Table(name = "users")
+public class UserEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id", nullable = false)
+	@Column(name = "user_id", nullable = false)
 	private Long id;
 
-	@Column(nullable = false, unique = true)
+	@Column(name = "name", nullable = false)
 	private String name;
+
+	@Column(name = "email", length = 512, unique = true)
+	private String email;
 }

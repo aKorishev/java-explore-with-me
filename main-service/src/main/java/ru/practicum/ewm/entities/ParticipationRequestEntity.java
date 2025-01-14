@@ -13,7 +13,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @Table(name = "participation_requests")
-public class ParticipationRequest {
+public class ParticipationRequestEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id", nullable = false)
@@ -21,11 +21,11 @@ public class ParticipationRequest {
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "requester_id", nullable = false)
-	private User requester;
+	private UserEntity requester;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "event_id", nullable = false)
-	private Event event;
+	private EventEntity eventEntity;
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status", nullable = false)
@@ -35,8 +35,8 @@ public class ParticipationRequest {
 
 	@Transient
 	public boolean isDataMatchRequest(long eventId, long initiatorId) {
-		return Objects.equals(event.getInitiator().getId(), initiatorId)
-				&& Objects.equals(event.getId(), eventId);
+		return Objects.equals(eventEntity.getInitiator().getId(), initiatorId)
+				&& Objects.equals(eventEntity.getId(), eventId);
 
 	}
 }

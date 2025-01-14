@@ -4,7 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.stereotype.Repository;
-import ru.practicum.ewm.entities.ParticipationRequest;
+import ru.practicum.ewm.entities.ParticipationRequestEntity;
 import ru.practicum.ewm.entities.RequestStatus;
 
 import java.util.Collection;
@@ -13,27 +13,27 @@ import java.util.Optional;
 
 @Repository
 public interface ParticipationRequestRepository
-		extends JpaRepository<ParticipationRequest, Long>, QuerydslPredicateExecutor<ParticipationRequest> {
+		extends JpaRepository<ParticipationRequestEntity, Long>, QuerydslPredicateExecutor<ParticipationRequestEntity> {
 
 	@Query(" select p " +
-			"from ParticipationRequest p " +
-			"where p.event.initiator.id = ?1 and p.event.id = ?2")
-	List<ParticipationRequest> findUserEventParticipationRequests(Long initiatorId, Long eventId);
+			"from ParticipationRequestEntity p " +
+			"where p.eventEntity.initiator.id = ?1 and p.eventEntity.id = ?2")
+	List<ParticipationRequestEntity> findUserEventParticipationRequests(Long initiatorId, Long eventId);
 
-	Optional<ParticipationRequest> findByRequesterIdAndId(Long id, Long id1);
+	Optional<ParticipationRequestEntity> findByRequesterIdAndId(Long id, Long id1);
 
-	List<ParticipationRequest> findByRequesterId(Long id);
+	List<ParticipationRequestEntity> findByRequesterId(Long id);
 
 	@Query(" select count(p) " +
-			"from ParticipationRequest p " +
-			"where p.event.id = ?1 and p.status = ?2 ")
+			"from ParticipationRequestEntity p " +
+			"where p.eventEntity.id = ?1 and p.status = ?2 ")
 	int countRequestsWithStatus(long eventId, RequestStatus status);
 
 	@Query(" select p " +
-			"from ParticipationRequest p " +
-			"where p.event.id = ?1 and p.status = ?2" +
+			"from ParticipationRequestEntity p " +
+			"where p.eventEntity.id = ?1 and p.status = ?2" +
 			"  and p not in ?3")
-	List<ParticipationRequest> findEventRequestsWithExclusionList(Long eventId,
-																  RequestStatus status,
-																  Collection<ParticipationRequest> excludeList);
+	List<ParticipationRequestEntity> findEventRequestsWithExclusionList(Long eventId,
+                                                                        RequestStatus status,
+                                                                        Collection<ParticipationRequestEntity> excludeList);
 }

@@ -11,10 +11,10 @@ import java.util.Set;
 @Getter
 @Setter
 @Table(name = "compilations")
-public class Compilation {
+public class CompilationEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id", nullable = false)
+	@Column(name = "comp_id", nullable = false)
 	private Long id;
 
 	private String title;
@@ -27,5 +27,5 @@ public class Compilation {
 			joinColumns = @JoinColumn(name = "comp_id"),
 			inverseJoinColumns = @JoinColumn(name = "event_id")
 	)
-	private Set<Event> events;
+	private Set<EventEntity> eventEntities;
 }

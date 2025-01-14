@@ -56,20 +56,20 @@ public class EventService {
 		PageRequest pageRequest = PageRequest.of(page.getNumber(), page.getSize());
 
 		// запрашиваем события из базы
-		List<Event> events = eventRepo.findAll(conditions, pageRequest).toList();
+		List<EventEntity> eventEntities = eventRepo.findAll(conditions, pageRequest).toList();
 
 		// запрашиваем количество одобренных заявок на участие
-		Map<Long, Long> eventToRequestsCount = getEventRequests(events);
+		Map<Long, Long> eventToRequestsCount = getEventRequests(eventEntities);
 
 		// запрашиваем количество просмотров каждого события у сервиса статистики
-		Map<Long, Long> eventToViewsCount = getEventViews(events);
+		Map<Long, Long> eventToViewsCount = getEventViews(eventEntities);
 
 		// формируем функцию для формирования нужного ответа из собранных данных
-		final Function<Event, ? extends EventShortDto> mapper =
+		final Function<EventEntity, ? extends EventShortDto> mapper =
 				makeSpecificMapper(eventToViewsCount, eventToRequestsCount, request.isShortFormat());
 
 		// формируем окончательный результат
-		return events.stream()
+		return eventEntities.stream()
 				.filter(e -> {
 					// если необходимо убираем события на участие в которых уже нельзя подать заявку
 					Long confirmedReqCount = eventToRequestsCount.getOrDefault(e.getId(), 0L);
@@ -84,32 +84,32 @@ public class EventService {
 	}
 
 	public EventFullDto findPublishedById(long id) {
-		Event event = eventRepo
+		EventEntity eventEntity = eventRepo
 				.findPublishedById(id)
 				.orElseThrow(() -> new NotFoundException("Event", id));
 
-//		Long views = statisticClient.getStats(
-//						ViewsStatsRequest.builder()
-//								.uri("/events/" + id)
-//								.start(event.getPublishedOn())
-//								.end(LocalDateTime.now())
-//								.unique(true)
-//								.build()
-//				)
-//				.stream()
-//				.findAny()
-//				.map(ViewStats::getHits)
-//				.orElse(0L);
+		Long views = statisticClient.getStats(
+						ViewsStatsRequest.builder()
+								.uri("/events/" + id)
+								.start(eventEntity.getPublishedOn())
+								.end(LocalDateTime.now())
+								.unique(true)
+								.build()
+				)
+				.stream()
+				.findAny()
+				.map(ViewStats::getHits)
+				.orElse(0L);
 
-		//Тест ломается, поэтому сделал бяку. Такое впечатление что стораж для статистики не работает во время провекрки
-		var views = hits.getOrDefault("/events/" + id, 0L);
+//		//Тест ломается, поэтому сделал бяку. Такое впечатление что стораж для статистики не работает во время провекрки
+//		var views = hits.getOrDefault("/events/" + id, 0L);
 
 		log.trace("Getted vievs for " + "/events/" + id + " is " + views);
 
-		QParticipationRequest req = QParticipationRequest.participationRequest;
-		long reqCount = requestRepository.count(req.event.eq(event).and(req.status.eq(RequestStatus.CONFIRMED)));
+		var req = QParticipationRequestEntity.participationRequestEntity;
+		long reqCount = requestRepository.count(req.eventEntity.eq(eventEntity).and(req.status.eq(RequestStatus.CONFIRMED)));
 
-		return Mapper.toEventFullDto(event, views, reqCount);
+		return Mapper.toEventFullDto(eventEntity, views, reqCount);
 	}
 
 	public void addHits(String uri) {
@@ -127,15 +127,15 @@ public class EventService {
 					"be no earlier than two hours from the current time.");
 		}
 
-		User initiator = userRepository.findById(initiatorId)
+		UserEntity initiator = userRepository.findById(initiatorId)
 				.orElseThrow(() -> new NotFoundException("User", initiatorId));
 
-		Category category = categoryRepository.findById(eventDto.getCategory())
+		CategoryEntity categoryEntity = categoryRepository.findById(eventDto.getCategory())
 				.orElseThrow(() -> new NotFoundException("Category", eventDto.getCategory()));
 
 
-		Event event = eventRepo.save(Mapper.toEvent(eventDto, initiator, category));
-		return Mapper.toEventFullDto(event);
+		EventEntity eventEntity = eventRepo.save(Mapper.toEvent(eventDto, initiator, categoryEntity));
+		return Mapper.toEventFullDto(eventEntity);
 	}
 
 	public List<ParticipationRequestDto> findUserEventParticipationRequests(long initiatorId, long eventId) {
@@ -145,8 +145,8 @@ public class EventService {
 				.collect(Collectors.toList());
 	}
 
-	public boolean checkEventUpdateAndUpdateEntity(Event entity,
-									EventToUpdateDto eventToUpdateDto) {
+	public boolean checkEventUpdateAndUpdateEntity(EventEntity entity,
+												   EventToUpdateDto eventToUpdateDto) {
 		var wasUpdated = false;
 
 		Predicate<String> predicateString = s -> s != null && !s.isBlank();
@@ -214,7 +214,7 @@ public class EventService {
 			var catId = eventToUpdateDto.category();
 			var category = categoryRepository.findById(catId)
 					.orElseThrow(() -> new NotFoundException("Category", catId));
-			entity.setCategory(category);
+			entity.setCategoryEntity(category);
 
 			wasUpdated = true;
 		}
@@ -244,7 +244,7 @@ public class EventService {
 	public EventFullDto updateEventByInitiator(long initiatorId,
 											   long eventId,
 											   EventToUpdateDto eventToUpdateDto) {
-		Event entity = eventRepo.findByIdAndInitiatorId(eventId, initiatorId)
+		EventEntity entity = eventRepo.findByIdAndInitiatorId(eventId, initiatorId)
 						.orElseThrow(() -> new NotFoundException("Event", eventId));
 
 		if (!(entity.isPending() || entity.isCanceled())) {
@@ -280,7 +280,7 @@ public class EventService {
 
 	@Transactional
 	public EventFullDto updateEvent(long eventId, EventToUpdateDto updateInfo) {
-		Event entity = eventRepo.findById(eventId)
+		EventEntity entity = eventRepo.findById(eventId)
 				.orElseThrow(() -> new NotFoundException("Event", eventId));
 
 		var isNeedToUpdate = checkEventUpdateAndUpdateEntity(entity, updateInfo);
@@ -324,7 +324,7 @@ public class EventService {
 			throw new IllegalStateException("The participant limit has been reached");
 		}
 
-		List<ParticipationRequest> requestsForConfirmation;
+		List<ParticipationRequestEntity> requestsForConfirmation;
 		// Если количество заявок на подтверждение больше доступного количества
 		if (requestIds.size() > limit - confirmed) {
 			// выгружаем только те заявки, для которых хватает лимита
@@ -345,14 +345,14 @@ public class EventService {
 		}
 
 		// обходим список указанных заявок и подтверждаем их
-		for (ParticipationRequest request : requestsForConfirmation) {
+		for (ParticipationRequestEntity request : requestsForConfirmation) {
 			//подтверждаем запрос
 			request.setStatus(RequestStatus.CONFIRMED);
 			confirmed++;
 		}
 
 		// если был достигнут лимит, то нужно отклонить все (не только указанные) заявки ожидающие подтверждения
-		List<ParticipationRequest> rejectedEvents;
+		List<ParticipationRequestEntity> rejectedEvents;
 		if (limit <= confirmed) {
 			rejectedEvents = requestRepository
 					.findEventRequestsWithExclusionList(eventId, RequestStatus.PENDING, requestsForConfirmation)
@@ -364,7 +364,7 @@ public class EventService {
 		}
 
 		// сохраняем все обработанные заявки
-		List<ParticipationRequest> processedReqs = new ArrayList<>(requestsForConfirmation);
+		List<ParticipationRequestEntity> processedReqs = new ArrayList<>(requestsForConfirmation);
 		processedReqs.addAll(rejectedEvents);
 		requestRepository.saveAll(processedReqs);
 
@@ -377,7 +377,7 @@ public class EventService {
 	public EventUpdateStatusResultDto rejectParticipationRequests(long eventInitiatorId,
 																  long eventId,
 																  Collection<Long> requestIds) {
-		List<ParticipationRequest> requestsForRejecting = requestRepository.findAllById(requestIds);
+		List<ParticipationRequestEntity> requestsForRejecting = requestRepository.findAllById(requestIds);
 
 		// проверяем, что пользователь отклоняющий запрос - это инициатор мероприятия
 		// и что идентификатор мероприятия соответствует идентификатору мероприятия в запросе
@@ -398,7 +398,7 @@ public class EventService {
 	}
 
 	private static BooleanExpression makeEventsQueryConditions(GetEventsRequest request) {
-		QEvent event = QEvent.event;
+		var event = QEventEntity.eventEntity;
 
 		List<BooleanExpression> conditions = new ArrayList<>();
 
@@ -415,7 +415,7 @@ public class EventService {
 		// если указан список категорий, фильтруем по нему
 		if (request.hasCategoriesCondition()) {
 			conditions.add(
-					event.category.id.in(request.getCategories())
+					event.categoryEntity.id.in(request.getCategories())
 			);
 		}
 
@@ -463,7 +463,7 @@ public class EventService {
 
 		// выгружаем события в указанном состоянии
 		if (request.hasStates()) {
-			conditions.add(QEvent.event.state.in(request.getStates()));
+			conditions.add(QEventEntity.eventEntity.state.in(request.getStates()));
 		}
 
 		return conditions
@@ -472,21 +472,21 @@ public class EventService {
 				.get();
 	}
 
-	private Map<Long, Long> getEventRequests(Collection<Event> events) {
-		QParticipationRequest req = QParticipationRequest.participationRequest;
+	private Map<Long, Long> getEventRequests(Collection<EventEntity> eventEntities) {
+		var req = QParticipationRequestEntity.participationRequestEntity;
 
 		BooleanExpression condition = req.status.eq(RequestStatus.CONFIRMED)
-				.and(req.event.in(events));
+				.and(req.eventEntity.in(eventEntities));
 
-		Iterable<ParticipationRequest> reqs = requestRepository.findAll(condition);
+		Iterable<ParticipationRequestEntity> reqs = requestRepository.findAll(condition);
 		return StreamSupport
 				.stream(reqs.spliterator(), false)
-				.collect(Collectors.groupingBy(r -> r.getEvent().getId(), Collectors.counting()));
+				.collect(Collectors.groupingBy(r -> r.getEventEntity().getId(), Collectors.counting()));
 	}
 
-	private Map<Long, Long> getEventViews(Collection<Event> events) {
-		Map<String, Long> eventUriAndIdMap = events.stream()
-				.map(Event::getId)
+	private Map<Long, Long> getEventViews(Collection<EventEntity> eventEntities) {
+		Map<String, Long> eventUriAndIdMap = eventEntities.stream()
+				.map(EventEntity::getId)
 				.collect(Collectors.toMap(id -> "/events/" + id, Function.identity()));
 
 		List<ViewStats> stats = statisticClient.getStats(
@@ -503,9 +503,9 @@ public class EventService {
 				));
 	}
 
-	private Function<Event, ? extends EventShortDto> makeSpecificMapper(Map<Long, Long> eventToViewsCount,
-																		Map<Long, Long> eventToRequestsCount,
-																		boolean isShortFormat) {
+	private Function<EventEntity, ? extends EventShortDto> makeSpecificMapper(Map<Long, Long> eventToViewsCount,
+																			  Map<Long, Long> eventToRequestsCount,
+																			  boolean isShortFormat) {
 		if (isShortFormat) {
 			// определяем функцию мэппинга
 			return event -> Mapper.toEventShortDto(
@@ -525,11 +525,11 @@ public class EventService {
 
 	private static boolean checkRequestsStatusUpdatePossible(long initiatorId,
 															 long eventId,
-															 List<ParticipationRequest> requests) {
+															 List<ParticipationRequestEntity> requests) {
 		// проверяем, что пользователь подтверждающий запрос - это инициатор мероприятия
 		// и что идентификатор мероприятия соответствует идентификатору мероприятия в заявке,
 		// а также что запрос находится в состоянии PENDING
-		Predicate<ParticipationRequest> validationPredicate = request ->
+		Predicate<ParticipationRequestEntity> validationPredicate = request ->
 				request.isDataMatchRequest(eventId, initiatorId)
 						&& request.getStatus().equals(RequestStatus.PENDING);
 
