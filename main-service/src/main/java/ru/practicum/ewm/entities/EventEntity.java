@@ -1,5 +1,6 @@
 package ru.practicum.ewm.entities;
 
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 import jakarta.persistence.*;
@@ -18,11 +19,17 @@ public class EventEntity {
 	@Column(name = "event_id", nullable = false)
 	private Long id;
 
+	@NotBlank
+	@Size(min = 3, max = 120)
 	@Column(nullable = false)
 	private String title;
 
+	@NotBlank
+	@Size(min = 20, max = 2000)
 	private String annotation;
 
+	@NotBlank
+	@Size(min = 20, max = 7000)
 	@Column(nullable = false)
 	private String description;
 
@@ -30,48 +37,43 @@ public class EventEntity {
 	@JoinColumn(name = "cat_id", nullable = false)
 	private CategoryEntity categoryEntity;
 
+	@PositiveOrZero
+	@NotNull
 	private int participantLimit;
 
-	@Builder.Default
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
-	private EventState state = EventState.PENDING;
+	private EventState state;
 
-	private boolean paid;
+	@NotNull
+	private Boolean paid;
 
-	@Column(nullable = false)
+	@NotNull
+	@Future
+	@Column(name = "event_date", nullable = false)
 	private LocalDateTime eventDate;
 
 	private float latitude;
 
 	private float longitude;
 
-	@Builder.Default
-	@Column(nullable = false)
-	private LocalDateTime createdOn = LocalDateTime.now();
+	@Column(name = "created_on", nullable = false)
+	private LocalDateTime createdOn;
 
+	@Column(name = "published_on")
 	private LocalDateTime publishedOn;
+
+	@Column(name = "confirmed_requests")
+	private long confirmedRequests;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "initiator_id", nullable = false)
 	private UserEntity initiator;
 
-	@Builder.Default
-	@Column(name = "req_moderation")
-	private boolean requestModeration = true;
+	@NotNull
+	@Column(name = "request_moderation")
+	private Boolean requestModeration;
 
 	@Transient
-	public boolean isPublished() {
-		return state.equals(EventState.PUBLISHED);
-	}
-
-	@Transient
-	public boolean isCanceled() {
-		return state.equals(EventState.CANCELED);
-	}
-
-	@Transient
-	public boolean isPending() {
-		return state.equals(EventState.PENDING);
-	}
+	private long views;
 }

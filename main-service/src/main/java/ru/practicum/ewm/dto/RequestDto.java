@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record ParticipationRequestDto(
+public record RequestDto(
 	Long id,
 	long requester,
 	long event,

@@ -21,15 +21,15 @@ public class UserEventController {
 	private final EventService eventService;
 
 	@GetMapping
-	public List<EventShortDto> getEvents(@PathVariable long userId,
+	public List<EventFullDto> getEvents(@PathVariable long userId,
 										 @RequestParam(defaultValue = "0") @PositiveOrZero int from,
 										 @RequestParam(defaultValue = "10") @Positive int size) {
-		return eventService.findUserEvents(userId, from, size);
+		return eventService.findAllByInitiatorId(from, size, userId);
 	}
 
 	@GetMapping("/{eventId}")
 	public EventFullDto getEvent(@PathVariable long userId, @PathVariable long eventId) {
-		return eventService.findUserEventById(userId, eventId);
+		return eventService.findEventByInitiatorId(userId, eventId);
 	}
 
 	@PostMapping
@@ -42,18 +42,18 @@ public class UserEventController {
 	public EventFullDto updateEvent(@PathVariable long userId,
 									@PathVariable long eventId,
 									@Valid @RequestBody EventToUpdateDto request) {
-		return eventService.updateEventByInitiator(userId, eventId, request);
+		return eventService.updateByInitiator(userId, eventId, request);
 	}
 
 	@GetMapping("/{eventId}/requests")
-	public List<ParticipationRequestDto> getEventParticipants(@PathVariable long userId, @PathVariable long eventId) {
-		return eventService.findUserEventParticipationRequests(userId, eventId);
+	public List<RequestDto> getEventParticipants(@PathVariable long userId, @PathVariable long eventId) {
+		return eventService.findRequestsByInitiatorId(userId, eventId);
 	}
 
 	@PatchMapping("/{eventId}/requests")
 	public EventUpdateStatusResultDto changeRequestStatus(@PathVariable long userId,
 														  @PathVariable long eventId,
 														  @RequestBody EventUpdateStatusRequestDto updateRequest) {
-		return eventService.changeParticipationReqStatus(userId, eventId, updateRequest);
+		return eventService.updateRequestStatus(userId, eventId, updateRequest);
 	}
 }

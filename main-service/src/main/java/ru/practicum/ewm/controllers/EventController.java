@@ -39,19 +39,17 @@ public class EventController {
                                                    @RequestParam(defaultValue = "10") @Positive int size,
                                                    HttpServletRequest httpRequest) {
 
-		List<? extends EventShortDto> result = eventService.find(
-				GetEventsRequest.builder()
-						.state(EventState.PUBLISHED)
-						.text(text)
-						.categories(categories)
-						.paid(paid)
-						.location(GetEventsRequest.Location.of(lat, lon, radius))
-						.dateRange(rangeStart, rangeEnd)
-						.onlyAvailableForParticipation(onlyAvailable)
-						.page(GetEventsRequest.Page.of(from, size))
-						.shortFormat(true)
-						.sort(sort)
-						.build()
+		List<? extends EventShortDto> result = eventService.searchPublic(
+				text,
+				categories,
+				paid,
+				rangeStart,
+				rangeEnd,
+				onlyAvailable,
+				sort,
+				from,
+				size,
+				httpRequest
 		);
 
 		statisticClient.hit(httpRequest);
@@ -63,9 +61,8 @@ public class EventController {
 
 	@GetMapping("/{id}")
 	public EventFullDto getEvent(@PathVariable long id, HttpServletRequest request) {
-		EventFullDto result = eventService.findPublishedById(id);
+		EventFullDto result = eventService.findByIdPublic(id, request);
 		statisticClient.hit(request);
-		eventService.addHits("/events/" + id);
 		return result;
 	}
 }

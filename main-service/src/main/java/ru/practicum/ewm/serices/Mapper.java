@@ -30,7 +30,10 @@ public final class Mapper {
 	}
 
 	public static EventFullDto toEventFullDto(EventEntity eventEntity) {
-		return toEventFullDto(eventEntity, null, null);
+		return toEventFullDto(eventEntity, null, null).toBuilder()
+				.views(eventEntity.getViews())
+				.confirmedRequests(eventEntity.getConfirmedRequests())
+				.build();
 	}
 
 	public static EventFullDto toEventFullDto(EventEntity eventEntity, Long views, Long confirmedRequests) {
@@ -42,13 +45,13 @@ public final class Mapper {
 				.category(toCategoryDto(eventEntity.getCategoryEntity()))
 				.participantLimit(eventEntity.getParticipantLimit())
 				.state(eventEntity.getState().name())
-				.paid(eventEntity.isPaid())
+				.paid(eventEntity.getPaid())
 				.eventDate(eventEntity.getEventDate())
 				.createdOn(eventEntity.getCreatedOn())
 				.publishedOn(eventEntity.getPublishedOn())
 				.initiator(Mapper.toUserShortDto(eventEntity.getInitiator()))
 				.location(new Location(eventEntity.getLatitude(), eventEntity.getLongitude()))
-				.requestModeration(eventEntity.isRequestModeration())
+				.requestModeration(eventEntity.getRequestModeration())
 				.views(views)
 				.confirmedRequests(confirmedRequests)
 				.build();
@@ -64,7 +67,7 @@ public final class Mapper {
 				.title(eventEntity.getTitle())
 				.annotation(eventEntity.getAnnotation())
 				.category(toCategoryDto(eventEntity.getCategoryEntity()))
-				.paid(eventEntity.isPaid())
+				.paid(eventEntity.getPaid())
 				.eventDate(eventEntity.getEventDate())
 				.initiator(Mapper.toUserShortDto(eventEntity.getInitiator()))
 				.views(viewsCount)
@@ -76,7 +79,7 @@ public final class Mapper {
 		return UserShortDto.of(userEntity.getId(), userEntity.getName());
 	}
 
-	public static ParticipationRequestDto toParticipationRequestDto(ParticipationRequestEntity request) {
+	public static RequestDto toRequestDto(RequestEntity request) {
 		var localDateTime = request.getCreated().toLocalDateTime();
 		localDateTime = LocalDateTime.of(
 				localDateTime.getYear(),
@@ -86,7 +89,7 @@ public final class Mapper {
 				localDateTime.getMinute(),
 				localDateTime.getSecond());
 
-		return new ParticipationRequestDto(
+		return new RequestDto(
 				request.getId(),
 				request.getRequester().getId(),
 				request.getEventEntity().getId(),
@@ -95,13 +98,13 @@ public final class Mapper {
 		);
 	}
 
-	public static ParticipationRequestEntity toNewParticipationRequest(UserEntity participant, EventEntity eventEntity) {
-		ParticipationRequestEntity request = new ParticipationRequestEntity();
+	public static RequestEntity toNewParticipationRequest(UserEntity participant, EventEntity eventEntity) {
+		RequestEntity request = new RequestEntity();
 		request.setRequester(participant);
 		request.setEventEntity(eventEntity);
 		// если для события отключена пре-модерация заявок на участие,
 		// то запрос на участие считается подтвержденным автоматически
-		if (!eventEntity.isRequestModeration()) {
+		if (!eventEntity.getRequestModeration()) {
 			request.setStatus(RequestStatus.CONFIRMED);
 		}
 		return request;

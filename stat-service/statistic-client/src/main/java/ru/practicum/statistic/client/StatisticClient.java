@@ -29,14 +29,16 @@ import java.util.List;
 public class StatisticClient {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    @Value("${spring.application.name}")
-    private String application;
-    @Value("${services.stats-service.uri}")
-    private String statsServiceUri;
+    private final String application;
+    private final String statsServiceUri;
     private final ObjectMapper json;
     private final HttpClient httpClient;
 
-    public StatisticClient(ObjectMapper json) {
+    public StatisticClient(@Value("${spring.application.name}") String application,
+                           @Value("${services.stats-service.uri}") String statsServiceUri,
+                           ObjectMapper json) {
+        this.application = application;
+        this.statsServiceUri = statsServiceUri;
         this.json = json;
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(5))
@@ -64,6 +66,8 @@ public class StatisticClient {
                     .build();
 
             httpClient.send(hitRequest, HttpResponse.BodyHandlers.discarding());
+
+            log.trace("Record hit sended, " + hit);
         } catch (Exception e) {
             log.error("Record hit error", e);
         }
@@ -88,6 +92,8 @@ public class StatisticClient {
             HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
             if (HttpStatus.valueOf(response.statusCode()).is2xxSuccessful()) {
+                log.trace("Response from {}: {}", statsServiceUri + "/stats", response.body());
+
                 return json.readValue(response.body(), new TypeReference<>() {
                 });
             }

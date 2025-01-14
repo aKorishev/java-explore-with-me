@@ -13,10 +13,10 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EventUpdateStatusResultDto {
     //todo одновременно обновляется один статус, поэтому держать 2 поля это дичь
-    private List<ParticipationRequestDto> confirmedRequests;
-    private List<ParticipationRequestDto> rejectedRequests;
+    private List<RequestDto> confirmedRequests;
+    private List<RequestDto> rejectedRequests;
 
-    public static EventUpdateStatusResultDto rejectedOnly(List<ParticipationRequestDto> requests) {
+    public static EventUpdateStatusResultDto rejectedOnly(List<RequestDto> requests) {
         EventUpdateStatusResultDto result = new EventUpdateStatusResultDto();
         result.setRejectedRequests(requests);
         return result;

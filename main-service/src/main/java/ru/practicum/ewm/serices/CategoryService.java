@@ -44,8 +44,7 @@ public class CategoryService {
 
     @Transactional
     public void delete(long catId) {
-        long categoryEvents = eventRepository.countByCategoryEntityId(catId);
-        if (categoryEvents > 0) {
+        if (eventRepository.existsByCategoryEntityId(catId)) {
             throw new IllegalStateException("The category is not empty");
         }
         if (categoryRepository.existsById(catId)) {
