@@ -72,6 +72,7 @@ public class RequestService {
 		return Mapper.toRequestDto(requestEntity);
 	}
 
+	@Transactional
 	public RequestDto cancelOwnRequest(long userId, long requestId) {
 		var requestEntity = requestRepository.findById(requestId)
 				.orElseThrow(() -> new NotFoundException("Request not found", requestId));
@@ -83,6 +84,7 @@ public class RequestService {
 		requestEntity.setStatus(RequestStatus.CANCELED);
 
 		requestRepository.saveAndFlush(requestEntity);
+
 		return Mapper.toRequestDto(requestEntity);
 	}
 }
