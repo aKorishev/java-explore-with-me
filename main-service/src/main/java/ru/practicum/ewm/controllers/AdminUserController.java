@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.ewm.dto.NewUserRequest;
+import ru.practicum.ewm.dto.UserToAddDto;
 import ru.practicum.ewm.dto.UserDto;
 
 import jakarta.validation.Valid;
@@ -35,8 +35,8 @@ public class AdminUserController {
 
 	@PostMapping
 	@ResponseStatus(code = HttpStatus.CREATED)
-	public UserDto registerUser(@RequestBody @Valid NewUserRequest newUserRequest) {
-		return userService.addUser(newUserRequest);
+	public UserDto registerUser(@RequestBody @Valid UserToAddDto userToAddDto) {
+		return userService.addUser(userToAddDto);
 	}
 
 	@DeleteMapping("/{userId}")

@@ -10,7 +10,7 @@ import java.io.Serializable;
 
 @Data
 @AllArgsConstructor(staticName = "of")
-public class NewUserRequest implements Serializable {
+public class UserToAddDto implements Serializable {
 
 	@NotBlank
 	@Size(min = 2, max = 250)

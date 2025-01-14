@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Builder
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class NewEventDto implements Serializable {
+public class EventToAddDto implements Serializable {
 
 	@Size(min = 3, max = 120)
 	private final @NotBlank String title;

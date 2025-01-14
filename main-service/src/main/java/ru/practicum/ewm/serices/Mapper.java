@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Mapper {
 
-	public static Event toEvent(NewEventDto dto, User initiator, Category category) {
+	public static Event toEvent(EventToAddDto dto, User initiator, Category category) {
 		return Event.builder()
 				.title(dto.getTitle())
 				.annotation(dto.getAnnotation())
@@ -23,8 +23,8 @@ public final class Mapper {
 				.paid(dto.isPaid())
 				.eventDate(dto.getEventDate())
 				.initiator(initiator)
-				.latitude(dto.getLocation().getLat())
-				.longitude(dto.getLocation().getLon())
+				.latitude(dto.getLocation().lat())
+				.longitude(dto.getLocation().lon())
 				.requestModeration(dto.isRequestModeration())
 				.build();
 	}
@@ -47,7 +47,7 @@ public final class Mapper {
 				.createdOn(event.getCreatedOn())
 				.publishedOn(event.getPublishedOn())
 				.initiator(Mapper.toUserShortDto(event.getInitiator()))
-				.location(Location.of(event.getLatitude(), event.getLongitude()))
+				.location(new Location(event.getLatitude(), event.getLongitude()))
 				.requestModeration(event.isRequestModeration())
 				.views(views)
 				.confirmedRequests(confirmedRequests)
@@ -86,7 +86,7 @@ public final class Mapper {
 				localDateTime.getMinute(),
 				localDateTime.getSecond());
 
-		return ParticipationRequestDto.of(
+		return new ParticipationRequestDto(
 				request.getId(),
 				request.getRequester().getId(),
 				request.getEvent().getId(),
@@ -122,7 +122,7 @@ public final class Mapper {
 		return UserDto.of(user.getId(), user.getName(), user.getEmail());
 	}
 
-	public static User toNewUser(NewUserRequest dto) {
+	public static User toNewUser(UserToAddDto dto) {
 		var entity = new User();
 		entity.setEmail(dto.getEmail());
 		entity.setName(dto.getName());
@@ -130,7 +130,7 @@ public final class Mapper {
 		return entity;
 	}
 
-	public static Compilation toNewCompilation(NewCompilationDto dto, Collection<Event> events) {
+	public static Compilation toNewCompilation(CompilationToAddDto dto, Collection<Event> events) {
 		Compilation compilation = new Compilation();
 		compilation.setTitle(dto.getTitle());
 		compilation.setPinned(dto.isPinned());
@@ -142,7 +142,7 @@ public final class Mapper {
 		return new CategoryDto(category.getId(), category.getName());
 	}
 
-    public static Category toNewCategory(NewCategoryDto categoryDto) {
+    public static Category toNewCategory(CategoryToAddDto categoryDto) {
 		Category category = new Category();
 		category.setName(categoryDto.getName());
 		return category;

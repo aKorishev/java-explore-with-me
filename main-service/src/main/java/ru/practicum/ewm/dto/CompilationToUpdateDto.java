@@ -10,7 +10,7 @@ import java.util.Set;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class UpdateCompilationRequest implements Serializable, PartialUpdateRequest {
+public class CompilationToUpdateDto implements Serializable, PartialUpdateRequest {
 	@Size(min = 1, max = 50)
 	private final String title;
 

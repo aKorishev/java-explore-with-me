@@ -26,21 +26,21 @@ public class EventController {
 	private final StatisticClient statisticClient;
 
 	@GetMapping
-	public List<? extends EventBase> getEvents(@RequestParam(required = false) @Size(min = 1, max = 7000) String text,
-											   @RequestParam(required = false) List<Long> categories,
-											   @RequestParam(required = false) Boolean paid,
-											   @RequestParam(defaultValue = "0") long lat,
-											   @RequestParam(defaultValue = "0") long lon,
-											   @RequestParam(defaultValue = "0") @PositiveOrZero short radius,
-											   @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") String rangeStart,
-											   @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") String rangeEnd,
-											   @RequestParam(defaultValue = "false") boolean onlyAvailable,
-											   @RequestParam(defaultValue = "EVENT_DATE") String sort,
-											   @RequestParam(defaultValue = "0") @PositiveOrZero int from,
-											   @RequestParam(defaultValue = "10") @Positive int size,
-											   HttpServletRequest httpRequest) {
+	public List<? extends EventShortDto> getEvents(@RequestParam(required = false) @Size(min = 1, max = 7000) String text,
+                                                   @RequestParam(required = false) List<Long> categories,
+                                                   @RequestParam(required = false) Boolean paid,
+                                                   @RequestParam(defaultValue = "0") long lat,
+                                                   @RequestParam(defaultValue = "0") long lon,
+                                                   @RequestParam(defaultValue = "0") @PositiveOrZero short radius,
+                                                   @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") String rangeStart,
+                                                   @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") String rangeEnd,
+                                                   @RequestParam(defaultValue = "false") boolean onlyAvailable,
+                                                   @RequestParam(defaultValue = "EVENT_DATE") String sort,
+                                                   @RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                                   @RequestParam(defaultValue = "10") @Positive int size,
+                                                   HttpServletRequest httpRequest) {
 
-		List<? extends EventBase> result = eventService.find(
+		List<? extends EventShortDto> result = eventService.find(
 				GetEventsRequest.builder()
 						.state(EventState.PUBLISHED)
 						.text(text)

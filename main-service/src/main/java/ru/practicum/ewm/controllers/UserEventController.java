@@ -35,7 +35,7 @@ public class UserEventController {
 
 	@PostMapping
 	@ResponseStatus(code = HttpStatus.CREATED)
-	public EventFullDto addEvent(@PathVariable long userId, @Valid @RequestBody NewEventDto eventDto) {
+	public EventFullDto addEvent(@PathVariable long userId, @Valid @RequestBody EventToAddDto eventDto) {
 		return eventService.addEvent(eventDto, userId);
 	}
 
@@ -52,9 +52,9 @@ public class UserEventController {
 	}
 
 	@PatchMapping("/{eventId}/requests")
-	public EventRequestStatusUpdateResult changeRequestStatus(@PathVariable long userId,
-															  @PathVariable long eventId,
-															  @RequestBody EventRequestStatusUpdateRequest updateRequest) {
+	public EventUpdateStatusResultDto changeRequestStatus(@PathVariable long userId,
+														  @PathVariable long eventId,
+														  @RequestBody EventUpdateStatusRequestDto updateRequest) {
 		return eventService.changeParticipationReqStatus(userId, eventId, updateRequest);
 	}
 }

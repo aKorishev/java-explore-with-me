@@ -5,12 +5,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.dto.CategoryDto;
-import ru.practicum.ewm.dto.NewCategoryDto;
+import ru.practicum.ewm.dto.CategoryToAddDto;
 import ru.practicum.ewm.entities.Category;
 import ru.practicum.ewm.exceptions.NotFoundException;
 import ru.practicum.ewm.repository.CategoryRepository;
 import ru.practicum.ewm.repository.EventRepository;
-import ru.practicum.ewm.serices.Mapper;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,7 +30,7 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryDto save(NewCategoryDto categoryDto) {
+    public CategoryDto save(CategoryToAddDto categoryDto) {
         Category category = categoryRepository.save(Mapper.toNewCategory(categoryDto));
         return Mapper.toCategoryDto(category);
     }
@@ -57,14 +56,14 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryDto update(CategoryDto categoryDto) {
-        Category category = categoryRepository.findById(categoryDto.getId())
-                .orElseThrow(() -> new NotFoundException("Category", categoryDto.getId()));
+    public CategoryDto update(long catId, CategoryDto categoryDto) {
+        Category entity = categoryRepository.findById(catId)
+                .orElseThrow(() -> new NotFoundException("Category", catId));
 
-        category.setName(categoryDto.getName());
+        entity.setName(categoryDto.name());
 
-        categoryRepository.save(category);
+        categoryRepository.saveAndFlush(entity);
 
-        return Mapper.toCategoryDto(category);
+        return Mapper.toCategoryDto(entity);
     }
 }

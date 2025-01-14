@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 @Data(staticConstructor = "of")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class NewCategoryDto implements Serializable {
+public class CategoryToAddDto implements Serializable {
 	@NotBlank
 	@Size(min = 1, max = 50)
 	private String name;

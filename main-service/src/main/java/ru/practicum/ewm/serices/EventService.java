@@ -46,7 +46,7 @@ public class EventService {
 	private final Map<String, Long> hits = new HashMap<>();
 
 
-	public List<? extends EventBase> find(GetEventsRequest request) {
+	public List<? extends EventShortDto> find(GetEventsRequest request) {
 
 		// формируем условия выборки
 		BooleanExpression conditions = makeEventsQueryConditions(request);
@@ -65,7 +65,7 @@ public class EventService {
 		Map<Long, Long> eventToViewsCount = getEventViews(events);
 
 		// формируем функцию для формирования нужного ответа из собранных данных
-		final Function<Event, ? extends EventBase> mapper =
+		final Function<Event, ? extends EventShortDto> mapper =
 				makeSpecificMapper(eventToViewsCount, eventToRequestsCount, request.isShortFormat());
 
 		// формируем окончательный результат
@@ -121,7 +121,7 @@ public class EventService {
 	}
 
 	@Transactional
-	public EventFullDto addEvent(NewEventDto eventDto, long initiatorId) {
+	public EventFullDto addEvent(EventToAddDto eventDto, long initiatorId) {
 		if (eventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
 			throw new IllegalStateException("The date and time of the event must " +
 					"be no earlier than two hours from the current time.");
@@ -222,8 +222,8 @@ public class EventService {
 		if (eventToUpdateDto.location() != null) {
 			var location = eventToUpdateDto.location();
 
-			entity.setLatitude(location.getLat());
-			entity.setLongitude(location.getLon());
+			entity.setLatitude(location.lat());
+			entity.setLongitude(location.lon());
 
 			wasUpdated = true;
 		}
@@ -295,9 +295,9 @@ public class EventService {
 	}
 
 	@Transactional
-	public EventRequestStatusUpdateResult changeParticipationReqStatus(long userId,
-																	   long eventId,
-																	   EventRequestStatusUpdateRequest updateRequest) {
+	public EventUpdateStatusResultDto changeParticipationReqStatus(long userId,
+																   long eventId,
+																   EventUpdateStatusRequestDto updateRequest) {
         return switch (updateRequest.getStatus()) {
             case CONFIRMED -> confirmParticipationRequests(userId, eventId, updateRequest.getRequestIds());
             case REJECTED -> rejectParticipationRequests(userId, eventId, updateRequest.getRequestIds());
@@ -307,9 +307,9 @@ public class EventService {
 	}
 
 
-	private EventRequestStatusUpdateResult confirmParticipationRequests(long eventInitiatorId,
-																		long eventId,
-																		Collection<Long> requestIds) {
+	private EventUpdateStatusResultDto confirmParticipationRequests(long eventInitiatorId,
+																	long eventId,
+																	Collection<Long> requestIds) {
 		long limit = eventRepo.findEventParticipantLimit(eventId);
 		// если ограничение не задано, то подтверждение заявок не требуется
 		if (limit == 0) {
@@ -368,15 +368,15 @@ public class EventService {
 		processedReqs.addAll(rejectedEvents);
 		requestRepository.saveAll(processedReqs);
 
-		return EventRequestStatusUpdateResult.of(
+		return EventUpdateStatusResultDto.of(
 				requestsForConfirmation.stream().map(Mapper::toParticipationRequestDto).collect(Collectors.toList()),
 				rejectedEvents.stream().map(Mapper::toParticipationRequestDto).collect(Collectors.toList())
 		);
 	}
 
-	public EventRequestStatusUpdateResult rejectParticipationRequests(long eventInitiatorId,
-																	  long eventId,
-																	  Collection<Long> requestIds) {
+	public EventUpdateStatusResultDto rejectParticipationRequests(long eventInitiatorId,
+																  long eventId,
+																  Collection<Long> requestIds) {
 		List<ParticipationRequest> requestsForRejecting = requestRepository.findAllById(requestIds);
 
 		// проверяем, что пользователь отклоняющий запрос - это инициатор мероприятия
@@ -394,7 +394,7 @@ public class EventService {
 				requestsForRejecting.stream()
 						.map(Mapper::toParticipationRequestDto)
 						.collect(Collectors.toList());
-		return EventRequestStatusUpdateResult.rejectedOnly(resultDtos);
+		return EventUpdateStatusResultDto.rejectedOnly(resultDtos);
 	}
 
 	private static BooleanExpression makeEventsQueryConditions(GetEventsRequest request) {
@@ -503,9 +503,9 @@ public class EventService {
 				));
 	}
 
-	private Function<Event, ? extends EventBase> makeSpecificMapper(Map<Long, Long> eventToViewsCount,
-																	Map<Long, Long> eventToRequestsCount,
-																	boolean isShortFormat) {
+	private Function<Event, ? extends EventShortDto> makeSpecificMapper(Map<Long, Long> eventToViewsCount,
+																		Map<Long, Long> eventToRequestsCount,
+																		boolean isShortFormat) {
 		if (isShortFormat) {
 			// определяем функцию мэппинга
 			return event -> Mapper.toEventShortDto(
@@ -537,7 +537,7 @@ public class EventService {
 	}
 
 	@RequiredArgsConstructor(staticName = "of")
-	private static class EventDtoComparator<T extends EventBase> implements Comparator<T> {
+	private static class EventDtoComparator<T extends EventShortDto> implements Comparator<T> {
 		private final GetEventsRequest.Sort sort;
 
 		@Override

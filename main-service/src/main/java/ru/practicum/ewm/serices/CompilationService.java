@@ -5,8 +5,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.dto.CompilationDto;
-import ru.practicum.ewm.dto.NewCompilationDto;
-import ru.practicum.ewm.dto.UpdateCompilationRequest;
+import ru.practicum.ewm.dto.CompilationToAddDto;
+import ru.practicum.ewm.dto.CompilationToUpdateDto;
 import ru.practicum.ewm.entities.Compilation;
 import ru.practicum.ewm.entities.Event;
 import ru.practicum.ewm.exceptions.NotFoundException;
@@ -45,7 +45,7 @@ public class CompilationService {
 	}
 
 	@Transactional
-	public CompilationDto save(NewCompilationDto compilationDto) {
+	public CompilationDto save(CompilationToAddDto compilationDto) {
 		List<Event> events;
 		if (compilationDto.getEvents() == null || compilationDto.getEvents().isEmpty()) {
 			events = new ArrayList<>();
@@ -87,7 +87,7 @@ public class CompilationService {
 	}
 
 	@Transactional
-	public CompilationDto update(long compId, UpdateCompilationRequest updateRequest) {
+	public CompilationDto update(long compId, CompilationToUpdateDto updateRequest) {
 
 		if (!updateRequest.isNeedAnyUpdates()) {
 			throw new IllegalArgumentException("The compilation update request contains no updates.");

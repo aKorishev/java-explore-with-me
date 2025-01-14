@@ -5,8 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.dto.CompilationDto;
-import ru.practicum.ewm.dto.NewCompilationDto;
-import ru.practicum.ewm.dto.UpdateCompilationRequest;
+import ru.practicum.ewm.dto.CompilationToAddDto;
+import ru.practicum.ewm.dto.CompilationToUpdateDto;
 
 import jakarta.validation.Valid;
 import ru.practicum.ewm.serices.CompilationService;
@@ -19,13 +19,13 @@ public class AdminCompilationController {
 
 	@PostMapping
 	@ResponseStatus(code = HttpStatus.CREATED)
-	public CompilationDto saveCompilation(@Valid @RequestBody NewCompilationDto compilationDto) {
+	public CompilationDto saveCompilation(@Valid @RequestBody CompilationToAddDto compilationDto) {
 		return compService.save(compilationDto);
 	}
 
 	@PatchMapping("/{compId}")
 	public CompilationDto updateCompilation(@PathVariable long compId,
-											@Valid @RequestBody UpdateCompilationRequest updateRequest) {
+											@Valid @RequestBody CompilationToUpdateDto updateRequest) {
 		return compService.update(compId, updateRequest);
 	}
 

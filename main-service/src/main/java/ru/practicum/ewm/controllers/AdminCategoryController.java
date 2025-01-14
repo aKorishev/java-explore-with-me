@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.dto.CategoryDto;
-import ru.practicum.ewm.dto.NewCategoryDto;
+import ru.practicum.ewm.dto.CategoryToAddDto;
 
 import jakarta.validation.Valid;
 import ru.practicum.ewm.serices.CategoryService;
@@ -18,14 +18,13 @@ public class AdminCategoryController {
 
 	@PostMapping
 	@ResponseStatus(code = HttpStatus.CREATED)
-	public CategoryDto addCategory(@Valid @RequestBody NewCategoryDto category) {
+	public CategoryDto addCategory(@Valid @RequestBody CategoryToAddDto category) {
 		return categoryService.save(category);
 	}
 
 	@PatchMapping("/{catId}")
 	public CategoryDto updateCategory(@PathVariable long catId, @Valid @RequestBody CategoryDto category) {
-		category.setId(catId);
-		return categoryService.update(category);
+		return categoryService.update(catId, category);
 	}
 
 	@DeleteMapping("/{catId}")

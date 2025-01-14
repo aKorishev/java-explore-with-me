@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.ewm.dto.NewUserRequest;
+import ru.practicum.ewm.dto.UserToAddDto;
 import ru.practicum.ewm.dto.UserDto;
 import ru.practicum.ewm.entities.User;
 import ru.practicum.ewm.exceptions.NotFoundException;
@@ -34,10 +34,10 @@ public class UserService {
 	}
 
 	@Transactional
-	public UserDto addUser(NewUserRequest newUserRequest) {
+	public UserDto addUser(UserToAddDto userToAddDto) {
 		var entity = new User();
-		entity.setName(newUserRequest.getName());
-		entity.setEmail(newUserRequest.getEmail());
+		entity.setName(userToAddDto.getName());
+		entity.setEmail(userToAddDto.getEmail());
 
 		userRepository.saveAndFlush(entity);
 		return Mapper.toUserDto(entity);

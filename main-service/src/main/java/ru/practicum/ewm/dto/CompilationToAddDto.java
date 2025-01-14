@@ -15,7 +15,7 @@ import java.util.Set;
 @Builder
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class NewCompilationDto implements Serializable {
+public class CompilationToAddDto implements Serializable {
 
 	@NotBlank
 	@Size(min = 1, max = 50)

@@ -11,12 +11,13 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor(staticName = "of")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class EventRequestStatusUpdateResult {
+public class EventUpdateStatusResultDto {
+    //todo одновременно обновляется один статус, поэтому держать 2 поля это дичь
     private List<ParticipationRequestDto> confirmedRequests;
     private List<ParticipationRequestDto> rejectedRequests;
 
-    public static EventRequestStatusUpdateResult rejectedOnly(List<ParticipationRequestDto> requests) {
-        EventRequestStatusUpdateResult result = new EventRequestStatusUpdateResult();
+    public static EventUpdateStatusResultDto rejectedOnly(List<ParticipationRequestDto> requests) {
+        EventUpdateStatusResultDto result = new EventUpdateStatusResultDto();
         result.setRejectedRequests(requests);
         return result;
     }

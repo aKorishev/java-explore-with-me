@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @SuperBuilder(toBuilder = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class EventFullDto extends EventBase {
+public class EventFullDto extends EventShortDto {
 
 	private final String description;
 

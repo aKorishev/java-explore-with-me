@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class EventRequestStatusUpdateRequest {
+public class EventUpdateStatusRequestDto {
     private List<Long> requestIds;
     private Status status;
 
