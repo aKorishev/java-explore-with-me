@@ -108,18 +108,14 @@ public final class Mapper {
 	}
 
 	public static CompilationDto toCompilationDto(Compilation compilation) {
-		return CompilationDto.builder()
-				.id(compilation.getId())
-				.title(compilation.getTitle())
-				.pinned(compilation.isPinned())
-				.events(
-						compilation
-								.getEvents()
-								.stream()
-								.map(Mapper::toEventShortDto)
-								.collect(Collectors.toSet())
-				)
-				.build();
+		return new CompilationDto(compilation.getId(),
+				compilation.getTitle(),
+				compilation.isPinned(),
+				compilation
+						.getEvents()
+						.stream()
+						.map(Mapper::toEventShortDto)
+						.collect(Collectors.toSet()));
 	}
 
 	public static UserDto toUserDto(User user) {
@@ -143,7 +139,7 @@ public final class Mapper {
 	}
 
 	public static CategoryDto toCategoryDto(Category category) {
-		return CategoryDto.of(category.getId(), category.getName());
+		return new CategoryDto(category.getId(), category.getName());
 	}
 
     public static Category toNewCategory(NewCategoryDto categoryDto) {

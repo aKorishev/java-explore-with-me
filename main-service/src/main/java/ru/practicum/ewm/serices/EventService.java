@@ -22,6 +22,7 @@ import ru.practicum.statistic.dto.ViewsStatsRequest;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -32,7 +33,6 @@ import static org.springframework.data.domain.Sort.Order.desc;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-//@ComponentScan(basePackages = "ru.practicum.statistic.client”)
 @ComponentScan(basePackages = {"ru.practicum.statistic.client"})
 @Slf4j
 public class EventService {
@@ -145,47 +145,121 @@ public class EventService {
 				.collect(Collectors.toList());
 	}
 
-	@SuppressWarnings("DataFlowIssue")
-	@Transactional
-	public EventFullDto updateEventByInitiator(long initiatorId, long eventId, UpdateEventUserRequest request) {
+	public boolean checkEventUpdateAndUpdateEntity(Event entity,
+									EventToUpdateDto eventToUpdateDto) {
+		var wasUpdated = false;
 
-		if (!request.isNeedAnyUpdates()) {
-			throw new IllegalArgumentException("The event update request contains no updates.");
+		Predicate<String> predicateString = s -> s != null && !s.isBlank();
+
+		if (eventToUpdateDto.eventDate() != null) {
+			var eventDate = eventToUpdateDto.eventDate();
+
+			if (eventDate.isBefore(LocalDateTime.now().plusHours(2)))
+				throw new IllegalStateException("The date and time of the event must " +
+						"be no earlier than two hours from the current time.");
+
+			entity.setEventDate(eventDate);
+
+			wasUpdated = true;
 		}
 
-		Event event = eventRepo.findByIdAndInitiatorId(eventId, initiatorId)
-				.orElseThrow(() -> new NotFoundException("Event", eventId));
+		wasUpdated = updateEventValue(eventToUpdateDto.title(), entity::setTitle, predicateString) || wasUpdated;
+		wasUpdated = updateEventValue(eventToUpdateDto.annotation(), entity::setAnnotation, predicateString) || wasUpdated;
+		wasUpdated = updateEventValue(eventToUpdateDto.description(), entity::setDescription, predicateString) || wasUpdated;
+		wasUpdated = updateEventValue(eventToUpdateDto.participantLimit(), entity::setParticipantLimit, Objects::nonNull) || wasUpdated;
+		wasUpdated = updateEventValue(eventToUpdateDto.paid(), entity::setPaid, Objects::nonNull) || wasUpdated;
+		wasUpdated = updateEventValue(eventToUpdateDto.requestModeration(), entity::setRequestModeration, Objects::nonNull) || wasUpdated;
 
-		if (!(event.isPending() || event.isCanceled())) {
+		if (eventToUpdateDto.stateAction() != null) {
+			switch (eventToUpdateDto.stateAction()) {
+				case EventToUpdateDto.StateAction.CANCEL_REVIEW: {
+					entity.setState(EventState.CANCELED);
+					wasUpdated = true;
+					break;
+				}
+				case EventToUpdateDto.StateAction.SEND_TO_REVIEW: {
+					entity.setState(EventState.PENDING);
+					wasUpdated = true;
+					break;
+				}
+				case EventToUpdateDto.StateAction.REJECT_EVENT: {
+					if (entity.isPublished())
+						throw new IllegalStateException("Can't update an event in state " + entity.getState().name());
+
+					entity.setState(EventState.CANCELED);
+					wasUpdated = true;
+					break;
+				}
+				case EventToUpdateDto.StateAction.PUBLISH_EVENT: {
+					if (!entity.isPending())
+						throw new IllegalStateException("Can't publish the event because it's not in the right state: " +
+								entity.getState());
+
+					// нельзя публиковать событие, которое начнется раньше чем через час от текущего момента
+					LocalDateTime oneHourLimit = LocalDateTime.now().plusHours(1);
+					if (entity.getEventDate().isBefore(oneHourLimit)) {
+						throw new IllegalStateException("The date and time of the event must be " +
+								"no earlier than one hour from the current moment.");
+					}
+					entity.setState(EventState.PUBLISHED);
+					entity.setPublishedOn(LocalDateTime.now());
+
+					wasUpdated = true;
+					break;
+				}
+			}
+		}
+
+		if (eventToUpdateDto.category() != null) {
+			var catId = eventToUpdateDto.category();
+			var category = categoryRepository.findById(catId)
+					.orElseThrow(() -> new NotFoundException("Category", catId));
+			entity.setCategory(category);
+
+			wasUpdated = true;
+		}
+
+		if (eventToUpdateDto.location() != null) {
+			var location = eventToUpdateDto.location();
+
+			entity.setLatitude(location.getLat());
+			entity.setLongitude(location.getLon());
+
+			wasUpdated = true;
+		}
+
+		return wasUpdated;
+	}
+
+	public <T> boolean updateEventValue(T value, Consumer<T> consumer, Predicate<T> predicate) {
+		if (!predicate.test(value))
+			return false;
+
+		consumer.accept(value);
+
+		return true;
+	}
+
+	@Transactional
+	public EventFullDto updateEventByInitiator(long initiatorId,
+											   long eventId,
+											   EventToUpdateDto eventToUpdateDto) {
+		Event entity = eventRepo.findByIdAndInitiatorId(eventId, initiatorId)
+						.orElseThrow(() -> new NotFoundException("Event", eventId));
+
+		if (!(entity.isPending() || entity.isCanceled())) {
 			throw new IllegalStateException("Only pending or canceled events can be changed");
 		}
 
-		updateEventExceptDateAndStatus(request, event);
+		var needUpdate = checkEventUpdateAndUpdateEntity(entity, eventToUpdateDto);
 
-		if (request.isEventDateNeedUpdate()) {
-			if (request.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
-				throw new IllegalStateException("The date and time of the event must " +
-						"be no earlier than two hours from the current time.");
-			}
-			event.setEventDate(request.getEventDate());
+		if (!needUpdate) {
+			throw new IllegalArgumentException("The event update request contains no updates.");
 		}
 
-		if (request.isStateNeedUpdate()) {
-			switch (request.getStateAction()) {
-				case CANCEL_REVIEW: {
-					event.setState(EventState.CANCELED);
-					break;
-				}
-				case SEND_TO_REVIEW: {
-					event.setState(EventState.PENDING);
-					break;
-				}
-			}
-		}
+		eventRepo.saveAndFlush(entity);
 
-		eventRepo.save(event);
-
-		return Mapper.toEventFullDto(event);
+		return Mapper.toEventFullDto(entity);
 	}
 
 	public List<EventShortDto> findUserEvents(long userId, int from, int size) {
@@ -205,95 +279,33 @@ public class EventService {
 	}
 
 	@Transactional
-	public EventFullDto updateEventByAdmin(long eventId, UpdateEventAdminRequest updateInfo) {
+	public EventFullDto updateEvent(long eventId, EventToUpdateDto updateInfo) {
+		Event entity = eventRepo.findById(eventId)
+				.orElseThrow(() -> new NotFoundException("Event", eventId));
 
-		if (!updateInfo.isNeedAnyUpdates()) {
+		var isNeedToUpdate = checkEventUpdateAndUpdateEntity(entity, updateInfo);
+
+		if (!isNeedToUpdate) {
 			throw new IllegalArgumentException("The event update request contains no updates.");
 		}
 
-		Event event = eventRepo.findById(eventId)
-				.orElseThrow(() -> new NotFoundException("Event", eventId));
+		eventRepo.saveAndFlush(entity);
 
-		updateEventExceptDateAndStatus(updateInfo, event);
-
-		if (updateInfo.isEventDateNeedUpdate()) {
-			//noinspection DataFlowIssue
-			if (updateInfo.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
-				throw new IllegalStateException("The date and time of the event must " +
-						"be no earlier than two hours from the current time.");
-			}
-			event.setEventDate(updateInfo.getEventDate());
-		}
-
-		if (updateInfo.isStateNeedUpdate()) {
-			//noinspection DataFlowIssue
-			switch (updateInfo.getStateAction()) {
-				case REJECT_EVENT:
-					return rejectEvent(event);
-				case PUBLISH_EVENT:
-					return publishEvent(event);
-				default:
-					throw new IllegalArgumentException("Unknown event status action");
-			}
-		}
-
-		eventRepo.save(event);
-
-		return Mapper.toEventFullDto(event);
+		return Mapper.toEventFullDto(entity);
 	}
 
 	@Transactional
 	public EventRequestStatusUpdateResult changeParticipationReqStatus(long userId,
 																	   long eventId,
 																	   EventRequestStatusUpdateRequest updateRequest) {
-		switch (updateRequest.getStatus()) {
-			case CONFIRMED:
-				return confirmParticipationRequests(userId, eventId, updateRequest.getRequestIds());
-			case REJECTED:
-				return rejectParticipationRequests(userId, eventId, updateRequest.getRequestIds());
-			default:
-				throw new IllegalArgumentException("The specified status is not supported(" +
-						updateRequest.getStatus() + ")");
-		}
+        return switch (updateRequest.getStatus()) {
+            case CONFIRMED -> confirmParticipationRequests(userId, eventId, updateRequest.getRequestIds());
+            case REJECTED -> rejectParticipationRequests(userId, eventId, updateRequest.getRequestIds());
+            default -> throw new IllegalArgumentException("The specified status is not supported(" +
+                    updateRequest.getStatus() + ")");
+        };
 	}
 
-	@SuppressWarnings("DataFlowIssue")
-	private void updateEventExceptDateAndStatus(UpdateEventBaseRequest request, Event event) {
-		if (request.isCategoryNeedUpdate()) {
-			Category category = categoryRepository.findById(request.getCategory())
-					.orElseThrow(() -> new NotFoundException("Category", request.getCategory()));
-			event.setCategory(category);
-		}
-
-		if (request.isTitleNeedUpdate()) {
-			event.setTitle(request.getTitle());
-		}
-
-		if (request.isDescriptionNeedUpdate()) {
-			event.setDescription(request.getDescription());
-		}
-
-		if (request.isAnnotationNeedUpdate()) {
-			event.setAnnotation(request.getAnnotation());
-		}
-
-		if (request.isPaidFlagNeedUpdate()) {
-			event.setPaid(request.getPaid());
-		}
-
-		if (request.isParticipantLimitNeedUpdate()) {
-			event.setParticipantLimit(request.getParticipantLimit());
-		}
-
-		if (request.isLocationNeedUpdate()) {
-			event.setLongitude(request.getLocation().getLon());
-			event.setLatitude(request.getLocation().getLat());
-		}
-
-		if (request.isRequestModerationNeedUpdate()) {
-			event.setRequestModeration(request.getRequestModeration());
-		}
-	}
 
 	private EventRequestStatusUpdateResult confirmParticipationRequests(long eventInitiatorId,
 																		long eventId,
@@ -346,7 +358,7 @@ public class EventService {
 					.findEventRequestsWithExclusionList(eventId, RequestStatus.PENDING, requestsForConfirmation)
 					.stream()
 					.peek(req -> req.setStatus(RequestStatus.REJECTED))
-					.collect(Collectors.toList());
+					.toList();
 		} else {
 			rejectedEvents = new ArrayList<>();
 		}
@@ -491,36 +503,6 @@ public class EventService {
 				));
 	}
 
-	private EventFullDto rejectEvent(Event event) {
-		// если событие уже опубликовано, то его поздно отклонять
-		if (event.isPublished()) {
-			throw new IllegalStateException("Can't update an event in state " + event.getState().name());
-		}
-		event.setState(EventState.CANCELED);
-		eventRepo.save(event);
-		return Mapper.toEventFullDto(event);
-	}
-
-	private EventFullDto publishEvent(Event event) {
-		// Событие можно опубликовать только если оно в состоянии ожидания
-		if (!event.isPending()) {
-			throw new IllegalStateException("Can't publish the event because it's not in the right state: " +
-					event.getState());
-		}
-
-		// нельзя публиковать событие, которое начнется раньше чем через час от текущего момента
-		LocalDateTime oneHourLimit = LocalDateTime.now().plusHours(1);
-		if (event.getEventDate().isBefore(oneHourLimit)) {
-			throw new IllegalStateException("The date and time of the event must be " +
-					"no earlier than one hour from the current moment.");
-		}
-		event.setState(EventState.PUBLISHED);
-		event.setPublishedOn(LocalDateTime.now());
-
-		eventRepo.save(event);
-		return Mapper.toEventFullDto(event);
-	}
-
 	private Function<Event, ? extends EventBase> makeSpecificMapper(Map<Long, Long> eventToViewsCount,
 																	Map<Long, Long> eventToRequestsCount,
 																	boolean isShortFormat) {
@@ -560,13 +542,10 @@ public class EventService {
 
 		@Override
 		public int compare(T event1, T event2) {
-			switch (sort) {
-				case VIEWS:
-					return Long.compare(event1.getViews(), event2.getViews());
-				case EVENT_DATE:
-				default:
-					return event1.getEventDate().compareTo(event2.getEventDate());
-			}
+            return switch (sort) {
+                case VIEWS -> Long.compare(event1.getViews(), event2.getViews());
+                default -> event1.getEventDate().compareTo(event2.getEventDate());
+            };
 		}
 	}
 }
