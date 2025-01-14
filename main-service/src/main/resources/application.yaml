@@ -9,6 +9,10 @@ spring:
   sql.init:
     mode: always
     schema-locations: classpath:schema.sql
-logging.level.ru.practicum: TRACE
+logging.level:
+  ru.practicum: TRACE
+  #org: TRACE
+  org:
+    zalando.logbook: TRACE
 
 
