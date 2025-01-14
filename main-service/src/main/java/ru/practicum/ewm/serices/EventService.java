@@ -101,9 +101,6 @@ public class EventService {
 				.map(ViewStats::getHits)
 				.orElse(0L);
 
-//		//Тест ломается, поэтому сделал бяку. Такое впечатление что стораж для статистики не работает во время провекрки
-//		var views = hits.getOrDefault("/events/" + id, 0L);
-
 		log.trace("Getted vievs for " + "/events/" + id + " is " + views);
 
 		var req = QParticipationRequestEntity.participationRequestEntity;

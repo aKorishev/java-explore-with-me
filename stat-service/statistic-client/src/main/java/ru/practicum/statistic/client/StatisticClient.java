@@ -22,27 +22,24 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.List;
 
 @Slf4j
 @Component
 public class StatisticClient {
-    private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    private final String application;
-    private final String statsServiceUri;
+    @Value("${spring.application.name}")
+    private String application;
+    @Value("${services.stats-service.uri}")
+    private String statsServiceUri;
     private final ObjectMapper json;
     private final HttpClient httpClient;
 
-    public StatisticClient(@Value("${spring.application.name}") String application,
-                           @Value("${services.stats-service.uri}") String statsServiceUri,
-                           ObjectMapper json) {
-        this.application = application;
-        this.statsServiceUri = statsServiceUri;
+    public StatisticClient(ObjectMapper json) {
         this.json = json;
         this.httpClient = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(2))
+                .connectTimeout(Duration.ofSeconds(5))
                 .build();
     }
 
@@ -66,23 +63,25 @@ public class StatisticClient {
                     .header(HttpHeaders.ACCEPT, "application/json")
                     .build();
 
-            HttpResponse<Void> response = httpClient.send(hitRequest, HttpResponse.BodyHandlers.discarding());
-            log.debug("Response from stats-service: {}", response);
+            httpClient.send(hitRequest, HttpResponse.BodyHandlers.discarding());
         } catch (Exception e) {
-            log.warn("Cannot record hit", e);
+            log.error("Record hit error", e);
         }
     }
 
     public List<ViewStats> getStats(ViewsStatsRequest request) {
         try {
-            String queryString = toQueryString(
-                    request.toBuilder()
-                            .application(application)
-                            .build()
-            );
+            String start = URLEncoder.encode(DATE_TIME_FORMATTER.format(request.getStart()), StandardCharsets.UTF_8);
+            String end = URLEncoder.encode(DATE_TIME_FORMATTER.format(request.getEnd()), StandardCharsets.UTF_8);
+
+            String query = String.format("?start=%s&end=%s&unique=%b&application=%s", start, end, request.isUnique(), application);
+            query += "&uris=" + String.join(",", request.getUris());
+            if (request.hasLimitCondition()) {
+                query += "&limit=" + request.getLimit();
+            }
 
             HttpRequest httpRequest = HttpRequest.newBuilder()
-                    .uri(URI.create(statsServiceUri + "/stats" + queryString))
+                    .uri(URI.create(statsServiceUri + "/stats" + query))
                     .header(HttpHeaders.ACCEPT, "application/json")
                     .build();
 
@@ -92,30 +91,9 @@ public class StatisticClient {
                 return json.readValue(response.body(), new TypeReference<>() {
                 });
             }
-            log.debug("Response from stats-service: {}", response);
         } catch (Exception e) {
-            log.warn("Cannot get view stats for request: " + request, e);
+            log.error("Get view stats error", e);
         }
-        return Collections.emptyList();
-    }
-
-    private String toQueryString(ViewsStatsRequest request) {
-        String start = encode(DTF.format(request.getStart()));
-        String end = encode(DTF.format(request.getEnd()));
-
-        String queryString = String.format("?start=%s&end=%s&unique=%b&application=%s",
-                start, end, request.isUnique(), application);
-
-        queryString += "&uris=" + String.join(",", request.getUris());
-
-        if (request.hasLimitCondition()) {
-            queryString += "&limit=" + request.getLimit();
-        }
-
-        return queryString;
-    }
-
-    private String encode(String value) {
-        return URLEncoder.encode(value, StandardCharsets.UTF_8);
+        return List.of();
     }
 }
