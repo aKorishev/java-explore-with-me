@@ -166,13 +166,18 @@ public final class Mapper {
 	}
 
 	public static CommentDto toCommentDto(CommentEntity commentEntity) {
-		return CommentDto.builder()
+		var builder = CommentDto.builder()
 				.id(commentEntity.getId())
 				.text(commentEntity.getText())
 				.authorId(commentEntity.getAuthor().getId())
-				.eventId(commentEntity.getEventEntity().getId())
-				.created(commentEntity.getCreated().toLocalDateTime())
-				.lastUpdateTime(commentEntity.getLastUpdateTime().toLocalDateTime())
-				.build();
+				.eventId(commentEntity.getEventEntity().getId());
+
+		if (commentEntity.getCreated() != null)
+			builder.created(commentEntity.getCreated().toLocalDateTime());
+
+		if (commentEntity.getLastUpdateTime() != null)
+			builder.lastUpdateTime(commentEntity.getLastUpdateTime().toLocalDateTime());
+
+		return builder.build();
 	}
 }
