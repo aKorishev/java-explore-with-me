@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.dto.CommentDto;
 import ru.practicum.ewm.serices.CommentService;
 
-import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
