@@ -41,79 +41,69 @@ Java, Spring (Boot, Data, Security, MVC), PostgreSQL, REST API, Docker, Mockito,
 
 ### main-service 
 
-- POST /users/{userId}/eventEntities - добавить новое событие
-- GET /users/{userId}/eventEntities/{eventId} - получить событие
-- PATCH /users/{userId}/eventEntities/{eventId} - изменить событие
-- GET /users/{userId}/eventEntities - получить события пользователя
-- GET /users/{userId}/eventEntities/{eventId}/requests - получить запросы пользователя на участие в событии 
-- PATCH /users/{userId}/eventEntities/{eventId}/requests - изменить статус (подтверждение, отмена) заявок на участие пользователя в событии
-<br>
-
-- GET /categories - получить все категории
-- GET /categories/{catId} - получить категорию
-<br>
-
-- GET /compilations - получить все подборки событий
-- GET /compilations/{compId} - получить подборку событий
-<br>
-
-- GET /admin/eventEntities - получить события по любым параметрам:
-    - users - список id пользователей
-    - states - список статусов события (PENDING, PUBLISHED, CANCELED)
-    - categories - список id категорий событий
-    - rangeStart - начало временного отрезка в формате yyyy-MM-dd HH:mm:ss
-    - rangeEnd - конец временного отрезка в формате yyyy-MM-dd HH:mm:ss
-    - from - параметр для пагинации
-    - size - параметр для пагинации
-- PATCH /admin/eventEntities/{eventId} - изменить событие 
-<br>
-
-- GET /eventEntities - получить события по любым параметрам:
-    - text - текст для поиска в названии и описании событий
-    - categories - список id категорий событий
-    - paid - только платные события (true/false)
-    - rangeStart - начало временного отрезка в формате yyyy-MM-dd HH:mm:ss
-    - rangeEnd - конец временного отрезка в формате yyyy-MM-dd HH:mm:ss
-    - onlyAvailable - только доступные события, т.е. у которых еще не исчерпан лимит участников (true/false)
-    - sort - способ сортировки событий (EVENT_DATE, VIEWS)
-    - from - параметр для пагинации
-    - size - параметр для пагинации
-- GET /eventEntities/{id} - получить событие
-<br>
-
-- POST /users/{userId}/requests - добавить запрос на участие в событии
-- GET /users/{userId}/requests - получить запросы пользователя на участие в событиях
-- DELETE /users/{userId}/requests/{requestId}/cancel - отменить запрос на участие в событии
-<br>
-
-- POST /users/{userId}/eventEntities/{eventId}/comments - добавить комментарий к событию
-- PATCH /users/{userId}/eventEntities/{eventId}/comments/{commentId} - обновить комментарий 
-- GET /users/{userId}/eventEntities/{eventId}/comments/{commentId} - получить комментарий к событию
-- DELETE /users/{userId}/eventEntities/{eventId}/comments/{commentId} - удалить комментарий к событию
-- GET /users/{userId}/eventEntities/{eventId}/comments - получить список комментариев пользователя к событию
-- GET /users/{userId}/comments - получить все комментарии пользователя
-<br>
-
-- POST /admin/users - добавить пользователя
-- GET /admin/users - получить всех пользователей
-- DELETE /admin/users/{userId} - удалить пользователя
-- POST /admin/compilations - добавить подборку событий
-- DELETE /admin/compilations/{compId} - удалить подборку событий
-- PATCH /admin/compilations/{compId} - обновить подборку событий
 - POST /admin/categories - добавить новую категорию
 - GET /admin/categories/{catId} - получить категорию событий
 - DELETE /admin/categories/{catId} - удалить категорию
-- GET /admin/comments - получить комментрии по любым параметрам:
-    - text - текст для поиска в содержании комментария
-    - users - список id пользователей
-    - eventEntities - список id событий
-    - statuses - статусы событий (PENDING, PUBLISHED, DELETED)
-    - rangeStart - начало временного отрезка в формате yyyy-MM-dd HH:mm:ss
-    - rangeEnd - конец временного отрезка в формате yyyy-MM-dd HH:mm:ss
-    - from - параметр для пагинации
-    - size - параметр для пагинации
-  - PATCH /admin/comments - изменить статусы комментариев 
+- DELETE /admin/comments/{commentId} - удалить комментарий
+- POST /admin/compilations - добавить подборку событий
+- DELETE /admin/compilations/{compId} - удалить подборку событий
+- PATCH /admin/compilations/{compId} - обновить подборку событий
+- GET /admin/events - получить события по любым параметрам:
+  - users - список id пользователей
+  - states - список статусов события (PENDING, PUBLISHED, CANCELED)
+  - categories - список id категорий событий
+  - rangeStart - начало временного отрезка в формате yyyy-MM-dd HH:mm:ss
+  - rangeEnd - конец временного отрезка в формате yyyy-MM-dd HH:mm:ss
+  - from - параметр для пагинации
+  - size - параметр для пагинации
+- PATCH /admin/events/{eventId} - изменить событие
+- POST /admin/users - добавить пользователя
+- GET /admin/users - получить всех пользователей
+- DELETE /admin/users/{userId} - удалить пользователя
 <br>
+
+
+- GET /categories - получить все категории
+- GET /categories/{catId} - получить категорию
+  <br>
+- 
+
+- GET /compilations - получить все подборки событий
+- GET /compilations/{compId} - получить подборку событий
+  <br>
+- 
+
+- POST /events/{eventId}/comments - получить события по любым параметрам:
+  - userid - идентификатор пользователя
+- GET /events/{eventId}/comments - получить список комментариев к событию
+- GET /events - получить события по любым параметрам:
+  - text - текст для поиска в названии и описании событий
+  - categories - список id категорий событий
+  - paid - только платные события (true/false)
+  - rangeStart - начало временного отрезка в формате yyyy-MM-dd HH:mm:ss
+  - rangeEnd - конец временного отрезка в формате yyyy-MM-dd HH:mm:ss
+  - onlyAvailable - только доступные события, т.е. у которых еще не исчерпан лимит участников (true/false)
+  - sort - способ сортировки событий (EVENT_DATE, VIEWS)
+  - from - параметр для пагинации
+  - size - параметр для пагинации
+- GET /events/{id} - получить событие
+  <br>
+
+
+
+- GET /users/{userId}/events - получить события пользователя
+- GET /users/{userId}/events/{eventId} - получить событие
+- POST /users/{userId}/events - добавить новое событие
+- PATCH /users/{userId}/events/{eventId} - изменить событие
+- GET /users/{userId}/events/{eventId}/requests - получить запросы пользователя на участие в событии
+- PATCH /users/{userId}/events/{eventId}/requests - изменить статус (подтверждение, отмена) заявок на участие пользователя в событии
+- DELETE /users/{userId}/comments/{commentId} - удалить комментарий от имени пользователя
+- PATCH /users/{userId}/comments/{commentId} - обновить комментарий от имени пользователя
+- GET /users/{userId}/requests - получить запросы пользователя на участие в событиях
+- POST /users/{userId}/requests - добавить запрос на участие в событии
+- PATCH /users/{userId}/requests/{requestId}/cancel - отменить запрос на участие в событии
+<br>
+
 
 ### stats-service 
 
@@ -122,5 +112,8 @@ Java, Spring (Boot, Data, Security, MVC), PostgreSQL, REST API, Docker, Mockito,
 
 ## Как использовать:
 Ознакомиться с примерами использования можно в [этой коллекции тестов Postman](https://github.com/yandex-praktikum/java-explore-with-me/tree/main_svc/postman)
+
+## last PR
+https://github.com/aKorishev/java-explore-with-me/pull/4
 
 
