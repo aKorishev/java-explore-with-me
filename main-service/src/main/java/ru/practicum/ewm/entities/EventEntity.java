@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 @Setter
 @Table(name = "events")
 @Builder(toBuilder = true)
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
+@NoArgsConstructor()
+@AllArgsConstructor()
 public class EventEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -7,5 +7,5 @@ import ru.practicum.ewm.entities.CommentEntity;
 import java.util.List;
 
 public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
-    public List<CommentEntity> findByEventEntityId(long eventId, Pageable pageable);
+    List<CommentEntity> findByEventEntityId(long eventId, Pageable pageable);
 }

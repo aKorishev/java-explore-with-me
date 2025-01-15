@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface RequestRepository extends JpaRepository<RequestEntity, Long> {
-	boolean existsByRequesterIdAndEventEntityId(int requesterId, int eventId);
-
 	List<RequestEntity> findAllByRequesterId(long requesterId);
 
 	List<RequestEntity> findAllByEventEntityId(long eventId);

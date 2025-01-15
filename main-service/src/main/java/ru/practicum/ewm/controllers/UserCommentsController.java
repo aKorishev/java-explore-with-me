@@ -22,7 +22,7 @@ public class UserCommentsController {
     }
 
     @PatchMapping("/{commentId}")
-    public CommentDto update(@RequestParam long userId,
+    public CommentDto update(@PathVariable long userId,
                              @PathVariable long commentId,
                              @RequestBody @Valid CommentDto commentDto) {
         return commentService.updateComment(commentId, userId, commentDto);
