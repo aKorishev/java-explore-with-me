@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import ru.practicum.ewm.dto.*;
 import ru.practicum.ewm.entities.*;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
@@ -150,4 +151,28 @@ public final class Mapper {
 		categoryEntity.setName(categoryDto.getName());
 		return categoryEntity;
     }
+
+	public static CommentEntity toCommentEntity(CommentDto commentDto) {
+		var entity = new CommentEntity();
+
+		entity.setText(commentDto.text());
+
+		if (commentDto.created() != null)
+			entity.setCreated(Timestamp.valueOf(commentDto.created()));
+		if (commentDto.lastUpdateTime() != null)
+			entity.setLastUpdateTime(Timestamp.valueOf(commentDto.lastUpdateTime()));
+
+		return entity;
+	}
+
+	public static CommentDto toCommentDto(CommentEntity commentEntity) {
+		return CommentDto.builder()
+				.id(commentEntity.getId())
+				.text(commentEntity.getText())
+				.authorId(commentEntity.getAuthor().getId())
+				.eventId(commentEntity.getEventEntity().getId())
+				.created(commentEntity.getCreated().toLocalDateTime())
+				.lastUpdateTime(commentEntity.getLastUpdateTime().toLocalDateTime())
+				.build();
+	}
 }

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.dto.ErrorResponse;
+import ru.practicum.ewm.exceptions.ConflictException;
 import ru.practicum.ewm.exceptions.IdIsAlreadyInUseException;
 import ru.practicum.ewm.exceptions.NotFoundException;
 import ru.practicum.ewm.exceptions.NotValidException;
@@ -89,6 +90,16 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handlerNotValid(final IdIsAlreadyInUseException e) {
+        log.debug(e.getMessage(), e);
+
+        return new ErrorResponse(
+                "CONFLICT",
+                e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handlerNotValid(final ConflictException e) {
         log.debug(e.getMessage(), e);
 
         return new ErrorResponse(
