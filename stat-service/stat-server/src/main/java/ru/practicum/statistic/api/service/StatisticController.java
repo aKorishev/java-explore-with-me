@@ -2,9 +2,10 @@ package ru.practicum.statistic.api.service;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.statistic.dto.StatisticRequest;
-import ru.practicum.statistic.dto.StatisticInfo;
+import ru.practicum.statistic.dto.EndpointHit;
+import ru.practicum.statistic.dto.ViewStats;
 
 import java.util.List;
 
@@ -14,18 +15,20 @@ public class StatisticController {
     public final StatisticService statisticService;
 
     @GetMapping("/stats")
-    public List<StatisticInfo> getStatistics(
+    public List<ViewStats> getStatistics(
             @RequestParam(defaultValue = "") String start,
             @RequestParam(defaultValue = "") String end,
-            @RequestParam(defaultValue = "") String[] uris,
+            @RequestParam(defaultValue = "") List<String> uris,
+            @RequestParam(required = false) Integer limit,
             @RequestParam(defaultValue = "false") Boolean unique
             ) {
-        return statisticService.getStatistics(start, end, uris, unique);
+        return statisticService.getCalculatedStatistics(start, end, uris, limit, unique);
     }
 
     @PostMapping("/hit")
-    public StatisticRequest postRequest(
-            @Valid @RequestBody StatisticRequest statisticRequest) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public EndpointHit postRequest(
+            @Valid @RequestBody EndpointHit statisticRequest) {
         return statisticService.postRequest(statisticRequest);
     }
 }

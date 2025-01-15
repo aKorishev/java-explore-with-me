@@ -8,6 +8,7 @@ import ru.practicum.statistic.dto.vlidators.TimeFormatConstraint;
 
 @Builder(toBuilder = true)
 public record StatisticRequest(
+    long id,
     @NotBlank
     String app,
     @NotBlank

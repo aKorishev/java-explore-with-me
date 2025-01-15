@@ -1,0 +1,18 @@
+spring:
+  application.name: ewm-main-service
+  jpa:
+    hibernate.ddl-auto: none
+    properties:
+      hibernate:
+        jdbc.time_zone: UTC
+        format_sql: true
+  sql.init:
+    mode: always
+    schema-locations: classpath:schema.sql
+logging.level:
+  ru.practicum: TRACE
+  #org: TRACE
+  org:
+    zalando.logbook: TRACE
+
+
